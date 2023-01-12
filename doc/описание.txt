@@ -1,0 +1,59 @@
+Есть мойки carWashS				
+У каждой есть владелец  carWashS.IdOwner = user.IdUser				
+У каждой мойки есть расписание работы по дням недели workShedule и время ежедневного начала-окончания работы carWashS.DailyStartTime, carWashS.DailyEndTime 				
+Для каждой мойки задана цена услуги Price 				
+Есть список пользователей users. Для каждого  задана 				
+	роль, 			
+	город и 			
+	адрес почты || телефон || ? куда и через что будем отправлять ему сообщение по Kafka при изменении в статусе заказа или еще по какому поводу			
+
+Пользователь может запросить 				
+
+	список  моек  в заданном городе
+	GET http://localhost:8080/api/v1/user-service/washs/town?City (возвращается список IdCarWash, Adress, Price)			
+
+	список  3 моек , ближайших к заданныи координатам (возвращается IdCarWash, Adress, Price) 			
+	GET /user/washs/geo?City (возвращается список IdCarWash, Adress, Price)			
+
+	для заданной IDCarWash и Date список свободных позиций для записи (если для данной IdCarWash, Date в timeTable нет ни одной строки, добавить строки, начиная с DailyStartTime до DailyEndTime с интервалом 30 минут) (возвращает  список Date, TimeBegin из timeTable, где StatusWork=FREE)			
+	пользователь может записаться на мойку передав  IdCarWash, Date, Time.  			
+		Если позиция FREE - timeTable.IdUser=IdUser, timeTable.StatusFree=BUSY - возврат Ok		
+		Если позиция Busy- возврат Cancel		
+	пользователь может отменить запись передав  IdCarWash, Date, Time. 			
+		Если был записан он timeTable.StatusFree=FREE, StatusWork=CANCEL_USER - возврат Ok 		
+		Если позиция Busy- возврат Cancel		
+	пользователь может запросить статус своей записи 	
+
+
+пользователи
+/api/v1/admin-service/userInfo
+--http://localhost:8083/api/v1/admin-service/userInfo
+http://localhost:8080/api/v1/admin-service/userInfo
+
+автомойки
+/api/v1/user-service/washs
+http://localhost:8080/api/v1/user-service/washs	
+
+//получить список моек ( в своем городе)
+//получить список 3-х близлежащих моек
+//получить список мойка-свободное время на выбранную мойку-дату
+	если timeTable(idCarWash,Date).count(*)=0
+		по Date определить день недели
+			если work_shedule(idCarWash,день недели)=1
+				for time=carWash(idCarWash).daily_start_time) to carWash(idCarWash).daily_end_time) step 30
+					+ timeTable(idCarWash,Date,Time)
+//записаться на выбранную мойку-дату-время
+//проверить статус своей записи user-мойка-дата-время
+//отказаться от своей записи user-мойка-дата-время
+
+-------------------------------------------
+
+Владелец может
+запросить список своих моек
+add/update/delete
+(car_wash + work_shedule)
+
+
+
+
+
