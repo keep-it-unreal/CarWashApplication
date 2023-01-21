@@ -1,29 +1,23 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+"Это учебный проект CarWash. CarWash - это приложение, которое предоставляет пользователям удобный функционал записи на автомобильные станции. В нем можно просмотреть список всех станций, найти ближайшую свободную и записаться в один клик. Основной функционал доступен через Telegram-бота.
 
-### What is this repository for? ###
+### Запуск приложения ###
 
-* Quick summary
-* Version
+* Запустить postgreSQL, в файле [application.yml](pr/src/master/CarWashService/src/main/resources/application.yml) указать необходимые параметры для подключения
+* В мавене выбрать Plugins -> spring-boot -> run
+* БД автоматически создается при запуске и при остановке удаляется
+
+
+### Апи приложения: ###
+* http://localhost:8080/v3/api-docs/
+* [Адрес Swagger](http://localhost:8080/swagger-ui/index.html)
+
+### Авторы: ###
+
+* Елена Бандура
+* Иван Яковлев
+* Владимир Зотов
+
+#### Полезные ссылки: ####
 * [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
