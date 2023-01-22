@@ -8,24 +8,34 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
+  <groupId>com.carwash.telegram</groupId>
   <artifactId>bevCarWashBot</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
+
   <name>bevCarWashBot</name>
-
-  <url>http://maven.apache.org</url>
-
   <description>Telegram bot for project CarWash</description>
   <properties>
     <java.version>11</java.version>
-    <telegram.version>5.6.0</telegram.version>
+    <telegram.version>6.4.0</telegram.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <postgresql.version>42.5.0</postgresql.version>
+    <lombok.version>1.18.24</lombok.version>
+    <springdoc.version>1.6.14</springdoc.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.telegram</groupId>
       <artifactId>telegrambots</artifactId>
+      <version>${telegram.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.telegram</groupId>
+      <artifactId>telegrambotsextensions</artifactId>
       <version>${telegram.version}</version>
     </dependency>
 
@@ -48,18 +58,22 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
       <optional>true</optional>
     </dependency>
 
-    <!--        <dependency>-->
-    <!--            <groupId>org.springframework.boot</groupId>-->
-    <!--            <artifactId>spring-boot-starter-data-jpa</artifactId>-->
-    <!--        </dependency>-->
-
+    <!--
     <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>8.0.31</version>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+    </dependency>
+    -->
+
+    <!-- https://mvnrepository.com/artifact/org.json/json -->
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20220924</version>
     </dependency>
 
     <dependency>
@@ -67,6 +81,40 @@
       <artifactId>gson</artifactId>
       <version>2.9.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-ui</artifactId>
+      <version>${springdoc.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+    <!--
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.12.2</version>
+    </dependency>
+    -->
+
+
   </dependencies>
 
   <build>
@@ -74,8 +122,17 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>2.7.2</version>
         <configuration>
           <executable>true</executable>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>9</source>
+          <target>9</target>
         </configuration>
       </plugin>
     </plugins>

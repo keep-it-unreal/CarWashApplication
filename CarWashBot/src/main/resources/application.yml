@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bevCarWashBot
+    username: postgres
+    password: 123456
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  sql:
+    init:
+      mode: always
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+server:
+  port: 8086
+
+logging:
+  level:
+    ru.edu: info
+    org:
+      springframework:
+        web:
+          client=DEBUG:
+  file:
+    name: carServiceBot.log
+    path: ./
+
+
+
+

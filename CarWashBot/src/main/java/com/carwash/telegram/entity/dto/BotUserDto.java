@@ -1,11 +1,11 @@
-package com.carwash.telegram.model;
+package com.carwash.telegram.entity.dto;
 
 import lombok.Data;
 
 import java.util.Objects;
 
 @Data
-public class BotUserModel {
+public class BotUserDto {
     private Long id;
     private String name;
 
@@ -15,13 +15,14 @@ public class BotUserModel {
 
     private String password;
 
-    private String city;
+    //private CityDto city;
+    private Long idCity;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BotUserModel that = (BotUserModel) o;
+        BotUserDto that = (BotUserDto) o;
         return name.toUpperCase().equals(that.name.toUpperCase());
     }
 
@@ -30,14 +31,4 @@ public class BotUserModel {
         return Objects.hash(name);
     }
 
-    @Override
-    public String toString() {
-        return "BotUserModel{" +
-                "name='" + name + '\'' +
-                ", phone='" + phone + '\'' +
-                ", addressMail='" + addressMail + '\'' +
-                ", password='" + password + '\'' +
-                ", city='" + city + '\'' +
-                '}';
-    }
 }
