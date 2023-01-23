@@ -2,22 +2,14 @@ package com.carwash.telegram.core;
 
 import com.carwash.telegram.entity.HttpAnswer;
 import com.carwash.telegram.entity.dto.*;
-import com.google.gson.JsonObject;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
-import java.io.*;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -27,21 +19,6 @@ public class BotController {
 
     private final RestTemplate restTemplate;
 
-    //carWash
-    private final static String TAG_ID = "id";
-    private final static String TAG_ADDRESS = "address";
-    private final static String TAG_PRICE = "price";
-    private final static String TAG_LATIT = "latitude";
-    private final static String TAG_LONG = "longitude";
-
-    //userInfo
-    private final static String TAG_USER_DTO = "UserInfoDto";
-    private final static String TAG_USER_ID = "id";
-
-    //city
-    private final static String TAG_CITY_ID = "id";
-    private final static String TAG_CITY_NAME = "name";
-
     /**
      * Вход пользователя в сервисе по имени и номеру телефона
      * @param userModel - dto пользователя ((имя, телефон)
@@ -50,8 +27,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer login(@RequestBody BotUserDto userModel) {
 
-        //String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
-        String url = "http://localhost:8080/api/v1/admin-service/userInfo/login/user";
+        String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -62,7 +38,9 @@ public class BotController {
             httpAnswer.setHttpStatus(response.getStatusCode());
 
             if (response.getStatusCode().equals(HttpStatus.OK)) {
-                httpAnswer.setID(response.getBody().getId());
+                if (response.getBody() != null) {
+                    httpAnswer.setID(response.getBody().getId());
+                }
             }
 
         } catch (Exception ex) {
@@ -80,7 +58,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer register(@RequestBody BotUserDto userModel) {
 
-        URL url = new URL("http://localhost:8080/api/v1/admin-service/userInfo/register/user");
+        URL url = new URL("http://localhost:8083/api/v1/admin-service/userInfo/register/user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -91,7 +69,9 @@ public class BotController {
             httpAnswer.setHttpStatus(response.getStatusCode());
             if (response.getStatusCode().equals(HttpStatus.CREATED)) {
 
-                httpAnswer.setID(response.getBody().getId());
+                if ( response.getBody() != null) {
+                    httpAnswer.setID(response.getBody().getId());
+                }
             }
 
         } catch (Exception ex) {
@@ -109,7 +89,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getAllCity() {
 
-        URL url = new URL("http://localhost:8080/api/v1/admin-service/city");
+        URL url = new URL("http://localhost:8083/api/v1/admin-service/city");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -128,8 +108,10 @@ public class BotController {
 
             httpAnswer.setHttpStatus(response.getStatusCode());
             if (httpAnswer.isSuccess()) {
-                allCityDtos = response.getBody();
-                httpAnswer.setObjectList(List.of(allCityDtos));
+                if ( response.getBody() != null) {
+                    allCityDtos = response.getBody();
+                    httpAnswer.setObjectList(List.of(allCityDtos));
+                }
             }
 
         } catch (Exception ex) {
@@ -234,7 +216,9 @@ public class BotController {
 
             httpAnswer.setHttpStatus(response.getStatusCode());
             if (httpAnswer.isSuccess()) {
-                httpAnswer.setObjectList(List.of(response.getBody()));
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
             }
 
         } catch (Exception ex) {
