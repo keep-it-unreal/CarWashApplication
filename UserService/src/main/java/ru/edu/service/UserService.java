@@ -1,18 +1,11 @@
 package ru.edu.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.edu.dao.entity.City;
 import ru.edu.dao.entity.UserInfo;
-import ru.edu.dao.repository.CityRepository;
 import ru.edu.dao.repository.UserRepository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +16,9 @@ public class UserService {
         return repository.findById(id).orElseThrow(() -> new RuntimeException("User not found, id = " + id));
     }
 
+    public UserInfo findByName(String name){
+        return repository.findByName(name).orElseThrow(() -> new RuntimeException("User not found, name = " + name));
+    }
     public UserInfo findByNameAndPhone(String name, String phone){
         return repository.findByNameAndPhone(name, phone).orElseThrow(() -> new RuntimeException("User not found, name = " + name + ", phone = " + phone));
     }

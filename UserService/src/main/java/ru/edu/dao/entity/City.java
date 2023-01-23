@@ -1,12 +1,11 @@
 package ru.edu.dao.entity;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "CITY")
-@Getter @Setter
-@RequiredArgsConstructor
+@Data
 public class City {
 
     @Id
