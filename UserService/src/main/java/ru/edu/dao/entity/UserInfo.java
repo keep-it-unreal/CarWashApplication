@@ -1,6 +1,6 @@
 package ru.edu.dao.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.edu.dao.dto.UserInfoDTO;

@@ -1,11 +1,11 @@
-package com.carwash.telegram.model;
+package com.carwash.telegram.entity.dto;
 
 import lombok.Data;
 
 import java.util.Objects;
 
 @Data
-public class CityModel {
+public class CityDto {
 
     private Long id;
 
@@ -15,8 +15,8 @@ public class CityModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CityModel cityModel = (CityModel) o;
-        return name.equalsIgnoreCase(cityModel.name);
+        CityDto cityDto = (CityDto) o;
+        return name.equalsIgnoreCase(cityDto.name);
     }
 
     @Override
