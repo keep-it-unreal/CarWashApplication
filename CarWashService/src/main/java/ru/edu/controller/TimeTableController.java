@@ -78,9 +78,8 @@ public class TimeTableController {
     @DeleteMapping("/order_off")
     public ResponseEntity<TimeTable> abandonOrder(@PathVariable Date date,
                                           @PathVariable Long carWashId,
-                                          //todo: зачем здесь айдишник? В репо я с ним ничего не делал
-                                          @PathVariable Integer id) {
-        return new ResponseEntity<>(timeTableService.abandonOrder(date, carWashId, id),HttpStatus.OK);
+                                          @PathVariable Integer idUser) {
+        return new ResponseEntity<>(timeTableService.abandonOrder(date, carWashId, idUser),HttpStatus.OK);
     }
 
     @GetMapping("/history-all")

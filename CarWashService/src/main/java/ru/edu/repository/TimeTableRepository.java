@@ -30,8 +30,8 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, TimeTableI
     List<TimeTable> getAllOrdersByUser(Long idUser);
 
     @Query(value = "delete from time_table tt " +
-            "where date_trunc('minute',tt.date_table) = date_trunc('minute',':date') and tt.car_wash_id = :carWashId", nativeQuery=true)
-    TimeTable abandonOrder(Date date, Long carWashId);
+            "where date_trunc('minute',tt.date_table) = date_trunc('minute',':date') and tt.car_wash_id = :carWashId and tt.user_info_id_user = :idUser", nativeQuery=true)
+    TimeTable abandonOrder(Date date, Long carWashId, Integer idUser);
 
 
 }

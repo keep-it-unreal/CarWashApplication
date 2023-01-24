@@ -30,8 +30,8 @@ public class TimeTableService {
     public List<TimeTable> getAllOrdersByUser (Long idUser){
         return repository.getAllOrdersByUser(idUser);
     }
-    public TimeTable abandonOrder(Date date, Long carWashId, Integer id){
-        return repository.abandonOrder(date, carWashId);
+    public TimeTable abandonOrder(Date date, Long carWashId, Integer idUser){
+        return repository.abandonOrder(date, carWashId, idUser);
     }
 
     public TimeTable findById(TimeTableID id) {
