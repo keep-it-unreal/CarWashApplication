@@ -1,5 +1,6 @@
 package ru.edu.util;
 
+import org.springframework.stereotype.Component;
 import ru.edu.entity.CarWash;
 
 import java.util.ArrayList;
@@ -7,9 +8,10 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+@Component
 public class DistanceCalculator {
 
-    public static List<CarWash> getNearestCarWashes(double pointLatitude,
+    public List<CarWash> getNearestCarWashes(double pointLatitude,
                                                     double pointLongitude,
                                                     List<CarWash> carWashList,
                                                     int carWashAmount) {
@@ -28,11 +30,11 @@ public class DistanceCalculator {
         return nearestCarWashList;
     }
 
-    public static double convertGradusesToRadians(double graduses) {
+    public double convertGradusesToRadians(double graduses) {
         return Math.toRadians(graduses);
     }
 
-    private static int calculateDistance(double lat1, double long1, double lat2, double long2) {
+    private int calculateDistance(double lat1, double long1, double lat2, double long2) {
         double radiusOfEarth = 6372.795; //radius of Earth in km
         return ((Double) (Math.acos(Math.sin(lat1) * Math.sin(lat2) +
                 Math.cos(lat1) * Math.cos(lat2) *

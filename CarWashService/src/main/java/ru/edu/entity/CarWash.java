@@ -1,6 +1,5 @@
 package ru.edu.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,7 +13,6 @@ import java.util.List;
 public class CarWash implements Serializable {
 
     @Id
-    @Column(name = "id_car_wash")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -28,28 +26,17 @@ public class CarWash implements Serializable {
 
     private double price;
 
-    //private Long idOwner;
-    //private Long idCity;
+    @ManyToOne(cascade = CascadeType.ALL)
+    private UserInfo userInfo;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_owner", foreignKey = @ForeignKey(name = "FK_CAR_WASH_USER"))
-    @JsonIgnore
-    private UserInfo ownerInfo;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_city", foreignKey = @ForeignKey(name = "FK_CAR_WASH_CITY"))
-    //@JsonIgnore
     private City city;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_car_wash", referencedColumnName = "id_car_wash")
-    @JsonIgnore
     private WorkShedule workShedule;
 
-    /*
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "carWash")
-    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL)
     private List<TimeTable> timeTableList;
-     */
+
 
 }

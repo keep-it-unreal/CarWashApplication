@@ -1,6 +1,5 @@
 package ru.edu.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,7 +15,7 @@ import java.io.Serializable;
 public class WorkShedule implements Serializable {
 
     @Id
-    @Column(name="id_car_wash")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.ORDINAL)
@@ -41,10 +40,5 @@ public class WorkShedule implements Serializable {
     private StatusShedule sunday;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_car_wash", referencedColumnName = "IdCarWash")
-    @JsonIgnore
     private CarWash carWash;
-
-
-
 }

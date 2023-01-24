@@ -27,6 +27,12 @@ public class UserController {
         return user;
     }
 
+    @GetMapping("/getUserByName/{username}")
+    public UserInfo findById(@PathVariable String username){
+        UserInfo user = userService.findByNameAndPhone(username,"8-910-001-01-01");
+        return user;
+    }
+
     @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserInfo> login(@RequestBody UserInfoDTO userInfoDTO){
         UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
