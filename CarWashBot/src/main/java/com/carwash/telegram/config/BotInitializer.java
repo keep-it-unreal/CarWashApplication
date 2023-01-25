@@ -17,17 +17,12 @@ import java.util.List;
 public class BotInitializer {
 
     @Autowired
-    //private BotCore botCore;
     private CommandBot commandBot;
 
     @EventListener({ContextRefreshedEvent.class})
     public void init() throws TelegramApiException {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
-            //telegramBotsApi.registerBot(botCore);
-
-            //DefaultBotOptions botOptions = new DefaultBotOptions();
-            //commandBot = new CommandBot(botOptions);
             telegramBotsApi.registerBot(commandBot);
 
         } catch (TelegramApiException e) {
@@ -46,7 +41,9 @@ public class BotInitializer {
             listOfCommand.add(new BotCommand("/start", "начало работы с ботом\n"));
             listOfCommand.add(new BotCommand("/login", "вход по имени и номеру телефона\n"));
             listOfCommand.add(new BotCommand("/register", "регистрация в сервисе\n"));
-            listOfCommand.add(new BotCommand("/orderon", "запись на мойку\n"));
+            listOfCommand.add(new BotCommand("/order", "запись на авто-мойку\n"));
+            listOfCommand.add(new BotCommand("/orders", "список активных заказов\n"));
+            listOfCommand.add(new BotCommand("/off", "отменить заказ\n"));
 
             listOfCommand.add(new BotCommand("/stop", "завершение работы с ботом\n"));
             listOfCommand.add(new BotCommand("/help", "список всех команд\n"));

@@ -1,0 +1,18 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - C:\bev\java\java\обучение\proekt\pr\data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: hello
+    ports:
+        - 8089:5432
+    car_wash_bot-service:
+        image: car_wash_boy_image
+        environment:
+          SPRING-DATASOURCE-URL: jdbc:postgresql://db:5432/postgres
+        ports:
+          - 8080:8086
+        depends_on:
+          - db
+

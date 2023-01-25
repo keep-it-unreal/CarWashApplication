@@ -49,32 +49,34 @@ public final class OrderOnSelectTimeCommand extends AnswerCommand {
 
             execute(absSender, answer, user);
 
-        } else {
-            botUser.setDateTable(callbackData);
-            botUser = botUserService.update(botUser);
-
-            TimeTableDto timeTableDto = new TimeTableDto();
-            timeTableDto.setDateTable(botUser.getDateTable());
-            timeTableDto.setIdCarWash(botUser.getIdCarWash());
-            timeTableDto.setIdUser(botUser.getIdUser());
-            timeTableDto.setStatusFree(StatusFree.BUSY);
-            timeTableDto.setStatusWork(StatusWork.PLANNED);
-
-            HttpAnswer httpAnswer = botController.orderOn(timeTableDto);
-
-            if (httpAnswer.isSuccess()) {
-                answer.setText(BotText.ORDER_ON_SUCCESS);
-
-            } else {
-                answer.setText(httpAnswer.getStatus());
-            }
-
-            botUser.setStepService(BotUserStepService.NONE);
-            botUserService.save(botUser);
-
-            execute(absSender, answer, user);
+            return;
 
         }
+
+        botUser.setDateTable(callbackData);
+        botUser = botUserService.update(botUser);
+
+        TimeTableDto timeTableDto = new TimeTableDto();
+        timeTableDto.setDateTable(botUser.getDateTable());
+        timeTableDto.setIdCarWash(botUser.getIdCarWash());
+        timeTableDto.setIdUser(botUser.getIdUser());
+        timeTableDto.setStatusFree(StatusFree.BUSY);
+        timeTableDto.setStatusWork(StatusWork.PLANNED);
+
+        HttpAnswer httpAnswer = botController.orderOn(timeTableDto);
+
+        if (httpAnswer.isSuccess()) {
+            answer.setText(BotText.ORDER_ON_SUCCESS);
+
+        } else {
+            answer.setText(BotText.ORDER_ON_ERROR);
+        }
+
+        botUser.setStepService(BotUserStepService.NONE);
+        botUserService.save(botUser);
+
+        execute(absSender, answer, user);
+
     }
 
 }

@@ -5,11 +5,7 @@ import com.carwash.telegram.entity.enums.BotUserStepService;
 import com.carwash.telegram.exception.ItemNotFoundException;
 import com.carwash.telegram.repository.BotUserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-
-
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -19,14 +15,7 @@ public class BotUserService {
 
     private final BotUserRepository repository;
 
-    /*
-    public List<BotUser> findAll() {
-
-        return repository.findAll();
-    }
-     */
-
-    /**
+    /***
      * Получить пользователя по name
      * в таблице сервисов бота
      * Если пользователя с именем name нет - будет исключение ItemNotFoundException
@@ -37,7 +26,7 @@ public class BotUserService {
         return repository.findById(id).orElseThrow(() -> new ItemNotFoundException("BotUser not found, id = " + id));
     }
 
-    /**
+    /***
      * Получить пользователя по name
      * в таблице сервисов бота
      * Если пользователя с именем name нет - будет добавлен
@@ -58,12 +47,11 @@ public class BotUserService {
         return botUserNew;
     }
 
-    /**
+    /***
      * Для пользователя с именем name
      * в таблице сервисов бота
      * установить шаг сервиса = step
      * @param name - имя пользователя
-     * @return step - шаг сервиса
      */
     public void setServiceStep(String name, BotUserStepService step) {
         BotUser botUser = getBotUser(name);
@@ -76,7 +64,7 @@ public class BotUserService {
         repository.save(botUser);
     }
 
-    /**
+    /***
     * Для пользователя с именем name
     * получить текущий шаг сервиса
     * @param name - имя пользователя
@@ -87,7 +75,7 @@ public class BotUserService {
         return botUser.getStepService();
     }
 
-    /**
+    /***
      * Создать нового пользователя
      * в таблице сервисов бота
      * @param botUser - данные пользователя
@@ -98,7 +86,7 @@ public class BotUserService {
     }
 
 
-    /**
+    /***
      * Обновить данные пользователя
      * в таблице сервисов бота
      * @param botUser - данные пользователя
@@ -109,7 +97,7 @@ public class BotUserService {
         return repository.save(botUser);
     }
 
-    /**
+    /***
      * Удалить данные пользователя
      * в таблице сервисов бота
      * @param id - имя пользователя

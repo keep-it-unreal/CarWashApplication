@@ -9,16 +9,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
-import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ForceReplyKeyboard;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
-import org.telegram.telegrambots.meta.updateshandlers.SentCallback;
 
 import javax.annotation.PostConstruct;
 
@@ -57,47 +53,46 @@ public class CommandBot extends TelegramLongPollingCommandBot {
 
 
     private String getNameFromUpdate(Update update) {
-        String name = new StringBuilder()
-                .append(update.getMessage().getChat().getFirstName())
-                .append(" ")
-                .append(update.getMessage().getChat().getLastName())
-                .toString();
-        return name;
+        return update.getMessage().getChat().getFirstName() + " " + update.getMessage().getChat().getLastName();
     }
 
 
     @PostConstruct
     public void init() {
 
-        log.info("Initializing CommandBot...");
+        log.info("Class = CommandBot. Initializing CommandBot...");
 
         // регистрация всех кастомных команд
-        log.info("Registering commands...");
-        log.info("Registering '/start'...");
+        log.info("Class = CommandBot. Registering commands...");
+        log.info("Class = CommandBot. Registering '/start'...");
         register(new StartCommand(botUserService, botController));
-        log.info("Registering '/login'...");
+        log.info("Class = CommandBot. Registering '/login'...");
         register(new LoginCommand(botUserService, botController));
-        log.info("Registering '/register'...");
+        log.info("Class = CommandBot. Registering '/register'...");
         register(new RegisterCommand(botUserService, botController));
-        log.info("Registering '/orderon'...");
+        log.info("Class = CommandBot. Registering '/order'...");
         register(new OrderOnCommand(botUserService, botController));
+        log.info("Class = CommandBot. Registering '/orders'...");
+        register(new ListOrderOnCommand(botUserService, botController));
+        log.info("Class = CommandBot. Registering '/off'...");
+        register(new OrderOffCommand(botUserService, botController));
+        log.info("Class = CommandBot. History '/off'...");
+        register(new HistoryCommand(botUserService, botController));
 
-        log.info("Registering '/stop'...");
+        log.info("Class = CommandBot. Registering '/stop'...");
         register(new StopCommand(botUserService, botController));
 
         helpCommand = new HelpCommand(this, botUserService, botController);
-        log.info("Registering '/help'...");
+        log.info("Class = CommandBot. Registering '/help'...");
         register(helpCommand);
 
         // обработка неизвестной команды
-        log.info("Registering default action'...");
+        log.info("Class = CommandBot. Registering default action'...");
         registerDefaultAction(((absSender, message) -> {
             UnknownCommand(message);
             helpCommand.execute(absSender, message.getFrom(), message.getChat(), new String[] {});
         }));
     }
-
-
 
     //Обрабатываем ответ на нажатие кнопки
     public void processCallbackQuery(Update update) {
@@ -129,6 +124,10 @@ public class CommandBot extends TelegramLongPollingCommandBot {
             OrderOnSelectTimeCommand orderOnSelectTimeCommand = new OrderOnSelectTimeCommand (botUserService, botController);
             orderOnSelectTimeCommand.execute(this, update, user, botUser);
 
+        } else if (botUser.getStepService() == BotUserStepService.ORDER_OFF_SELECT_ORDER) {
+
+            OrderOffSelectOrdreCommand orderOffSelectOrdreCommand = new OrderOffSelectOrdreCommand (botUserService, botController);
+            orderOffSelectOrdreCommand.execute(this, update, user, botUser);
 
         } else {
             log.info("The user {} pressed the button at an unknown step {}", update.getCallbackQuery().getMessage().getFrom().getId(), botUser.getStepService());
@@ -148,22 +147,37 @@ public class CommandBot extends TelegramLongPollingCommandBot {
             return;
         }
 
+        if (update.getMessage() == null || update.getMessage().getFrom() == null) {
+            log.error("Update doesn't have a body!");
+            return;
+        }
+
+
+        log.info("MESSAGE_PROCESSING user = {}", update.getMessage().getFrom().getId());
+
+        BotUser botUser = botUserService.getBotUser(getNameFromUser(update.getMessage().getFrom()));
+        Message msg = update.getMessage();
+        User user = msg.getFrom();
+        Chat chat = msg.getChat();
+        String text = msg.getText();
+
+        if (botUser.getStepService() == BotUserStepService.NEAR_CAR_WASH &&
+                update.getMessage().getLocation() != null) {
+
+            text = update.getMessage().getLocation().getLatitude() + " " + update.getMessage().getLocation().getLongitude();
+            OrderOnNearCarWash orderOnNearCarWash = new OrderOnNearCarWash(botUserService, botController);
+            orderOnNearCarWash.execute(this, user, chat, text, botUser);
+
+            return;
+        }
+
         if (!update.hasMessage()) {
             log.error("Update doesn't have a body!");
             return;
         }
 
-        log.info("MESSAGE_PROCESSING user = {}", update.getMessage().getFrom().getId());
-
-        BotUser botUser = botUserService.getBotUser(getNameFromUser(update.getMessage().getFrom()));
-
         SendMessage answer = new SendMessage();
         answer.setChatId(update.getMessage().getChat().getId());
-
-        Message msg = update.getMessage();
-        User user = msg.getFrom();
-        Chat chat = msg.getChat();
-        String text = msg.getText();
 
         if (!canSendMessage(user, msg, botUser)) {
             return;
@@ -186,82 +200,15 @@ public class CommandBot extends TelegramLongPollingCommandBot {
 
         } else
         if (botUser.getStepService() == BotUserStepService.NEAR_CAR_WASH) {
-            /*
-            String text = update.getMessage().getText();
-            String[] parts = text.split(" ");
-            String lattid = parts[0];
-            String longt = parts[1];
 
-            neaCarWash = botController.getNeaCarWash(lattid, longt);
-            executeMessage(sendMessageService.createTextMessage(update, neaCarWash));
-            */
-            onTest(msg);
+            OrderOnNearCarWash orderOnNearCarWash = new OrderOnNearCarWash(botUserService, botController);
+            orderOnNearCarWash.execute(this, user, chat, text, botUser);
+
         } else {
-
-        }
-
-        /*
-        String clearMessage = msg.getText();
-        String messageForUsers = String.format("%s:\n%s", mAnonymouses.getDisplayedName(user), msg.getText());
-
-        SendMessage answer = new SendMessage();
-
-        // отправка ответа отправителю о том, что его сообщение получено
-        answer.setText(clearMessage);
-        answer.setChatId(msg.getChatId());
-        replyToUser(answer, user);
-
-        // отправка сообщения всем остальным пользователям бота
-        answer.setText(messageForUsers);
-        Stream<Anonymous> anonymouses = mAnonymouses.anonymouses();
-        anonymouses.filter(a -> !a.getUser().equals(user))
-                .forEach(a -> {
-                    answer.setChatId(a.getChat().getId());
-                    sendMessageToUser(answer, a.getUser(), user);
-                });
-
-         */
-    }
-
-    private void onTest(Message message) {
-        SendMessage sendMessageRequest = new SendMessage();
-        sendMessageRequest.setChatId(message.getChatId());
-        sendMessageRequest.setReplyToMessageId(message.getMessageId());
-        ForceReplyKeyboard forceReplyKeyboard = new ForceReplyKeyboard();
-        forceReplyKeyboard.setSelective(true);
-        sendMessageRequest.setReplyMarkup(forceReplyKeyboard);
-        sendMessageRequest.setText("Пожалуйста, ответьте на это сообщение, указав пункт назначения.");
-
-        try {
-            executeAsync(sendMessageRequest, new SentCallback<Message>() {
-                @Override
-                public void onResult(BotApiMethod<Message> method, Message sentMessage) {
-                    if (sentMessage != null) {
-
-                        User userFrom = message.getFrom();
-                        Integer sendMessageId = sentMessage.getMessageId();
-                        String messageText = message.getText();
-                        String sendMessageText = sentMessage.getText();
-                        /*
-                        DatabaseManager.getInstance().addUserForDirection(message.getFrom().getId(), WATING_DESTINY_STATUS,
-                                sentMessage.getMessageId(), message.getText());
-
-                         */
-                    }
-                }
-
-                @Override
-                public void onError(BotApiMethod<Message> botApiMethod, TelegramApiRequestException e) {
-                }
-
-                @Override
-                public void onException(BotApiMethod<Message> botApiMethod, Exception e) {
-                }
-            });
-        } catch (TelegramApiException e) {
-            log.error("onTest", e);
+            log.info("Warning!!! Selection completed, option not selected");
         }
     }
+
 
     private void UnknownCommand(Message message) {
 
@@ -296,7 +243,7 @@ public class CommandBot extends TelegramLongPollingCommandBot {
 
         if (botUser.getStepService() != BotUserStepService.LOGIN &&
                 botUser.getStepService() != BotUserStepService.REGISTER &&
-                botUser.isIslogin() == false) {
+                !botUser.isIslogin()) {
 
             log.info("User {} is trying to send message without starting the bot!", user.getId());
             answer.setText(BotText.LOGIN_OR_REGISTRY);
@@ -317,11 +264,6 @@ public class CommandBot extends TelegramLongPollingCommandBot {
     }
 
     private String getNameFromUser(User user) {
-        String name = new StringBuilder()
-                .append(user.getFirstName())
-                .append(" ")
-                .append(user.getLastName())
-                .toString();
-        return name;
+        return user.getFirstName() + " " + user.getLastName();
     }
 }

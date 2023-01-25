@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.Instant;
 
 @Entity
 @Data
@@ -44,5 +43,9 @@ public class BotUser implements Serializable {
 
     @Column(name = "date_table")
     private String dateTable;
+
+    private String latitude;
+
+    private String longitude;
 
 }

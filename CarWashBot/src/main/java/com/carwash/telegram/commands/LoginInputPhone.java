@@ -65,7 +65,7 @@ public final class LoginInputPhone extends AnswerCommand {
             botUser.setIdUser(httpAnswer.getID());
 
         } else {
-            sb.append(httpAnswer.getStatus());
+            sb.append(BotText.LOGIN_ERROR);
             botUser.setIslogin(false);
         }
 
@@ -83,7 +83,7 @@ public final class LoginInputPhone extends AnswerCommand {
      */
     private boolean ValidatePhone(String text) {
 
-        if (text == null || text == "") {
+        if (text == null || text.equals("")) {
             return false;
         }
 

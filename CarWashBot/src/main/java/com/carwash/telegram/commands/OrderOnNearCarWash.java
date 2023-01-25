@@ -11,46 +11,49 @@ import com.carwash.telegram.util.UncheckedConversion;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public final class OrderOnNearOrAll extends AnswerCommand {
+public final class OrderOnNearCarWash extends AnswerCommand {
 
     // обязательно нужно вызвать конструктор суперкласса,
     // передав в него имя и описание команды
-    public OrderOnNearOrAll(BotUserService botUserService,
-                            BotController botController) {
-        super("on", "Выбор - для оформления заказа вывести список всех моек или ближайших\n", botUserService, botController);
+    public OrderOnNearCarWash(BotUserService botUserService,
+                              BotController botController) {
+        super("order_on_near_car_wash", "ввод координат местонахождения\n", botUserService, botController);
     }
 
     /**
      * обработка сообщения, введенного пользователем
      * @param absSender - отправляет ответ пользователю
-     * @param update - сообщение
      * @param user - пользователь, который выполнил команду
+     * @param chat - чат бота и пользователя
+     * @param text - текст сообщения
      * @param botUser - данные, связанные с действиями пользователя
      */
-    public void execute(AbsSender absSender, Update update, User user, BotUser botUser) {
+    public void execute(AbsSender absSender, User user, Chat chat, String text, BotUser botUser) {
 
-        String callbackData = update.getCallbackQuery().getData();
+        log.info("COMMAND_PROCESSING userId = {} commandId = {}", user.getId(), getCommandIdentifier());
 
         SendMessage answer = new SendMessage();
-        answer.setChatId(update.getCallbackQuery().getMessage().getChat().getId());
+        answer.setChatId(chat.getId().toString());
 
-        // вывести список всех авто-моек в городе user
-        if (callbackData.equals(BotText.SELECT_ALL)) {
+        try {
+            String[] parts = text.split(" ");
+            String lattitude = parts[0];
+            String longitude = parts[1];
 
-            HttpAnswer httpAnswer = botController.getAllCarWash(botUser.getIdUser(), botUser.getDateOrder());
+            botUser.setLatitude(lattitude);
+            botUser.setLongitude(longitude);
+            botUser = botUserService.update(botUser);
+
+            HttpAnswer httpAnswer = botController.getNewCarWash(botUser.getIdUser(), botUser.getDateOrder(), botUser.getLatitude(), botUser.getLongitude());
 
             if (!httpAnswer.isSuccess()) {
                 answer.setText(httpAnswer.getStatus());
@@ -65,54 +68,27 @@ public final class OrderOnNearOrAll extends AnswerCommand {
             List rawList = httpAnswer.getObjectList();
             List<CarWashDto> allCarWash = UncheckedConversion.castList(CarWashDto.class, rawList);
 
-            answer = getSelectCommandButton(update.getCallbackQuery().getMessage().getChat(), allCarWash);
+            if (allCarWash.size() == 0) {
+                answer.setText(BotText.LIST_CAR_WASH_EMPTY);
+                execute(absSender, answer, user);
+
+                botUser.setStepService(BotUserStepService.NONE);
+                botUserService.save(botUser);
+                return;
+            }
+
+            answer = getSelectCommandButton(chat, allCarWash);
             execute(absSender, answer, user);
 
             botUser.setStepService(BotUserStepService.ORDER_ON_SELECT_CAR_WASH);
             botUserService.save(botUser);
 
 
-            // если требуется список близлежащих моек
-        } else if (callbackData.equals(BotText.SELECT_NEAR)) {
-            answer = getNearCommandButton(update.getCallbackQuery().getMessage().getChat());
+        } catch (Exception ex) {
+            log.info("User {} entered invalid coordinates", user.getId());
+            answer.setText(BotText.ORDER_COORD_TEXT);
             execute(absSender, answer, user);
-
-            botUser.setStepService(BotUserStepService.NEAR_CAR_WASH);
-            botUserService.save(botUser);
-
-        } else {
-
-            answer.setText(BotText.UNKNOWN_ERROR);
-            execute(absSender, answer, user);
-
         }
-    }
-
-    public SendMessage getNearCommandButton(Chat chat) {
-
-        SendMessage message = new SendMessage();
-        long chatId = chat.getId();
-        message.setChatId(String.valueOf(chatId));
-        message.setText(BotText.ORDER_COORD_TEXT);
-
-        //добавляем кнопку авто-формирования геолокации
-        ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-
-        List<KeyboardRow> rowsInLine = new ArrayList<>();
-        KeyboardRow keyboardRow = new KeyboardRow();
-
-        KeyboardButton keyboardButton = new KeyboardButton();
-        keyboardButton.setText(BotText.ORDER_COORD_BTN);
-        keyboardButton.setRequestLocation(true);
-
-        keyboardRow.add(keyboardButton);
-        rowsInLine.add(keyboardRow);
-
-        keyboardMarkup.setKeyboard(rowsInLine);
-
-        message.setReplyMarkup(keyboardMarkup);
-
-        return message;
     }
 
     public SendMessage getSelectCommandButton(Chat chat, List<CarWashDto> all) {
@@ -150,7 +126,7 @@ public final class OrderOnNearOrAll extends AnswerCommand {
         btn.setCallbackData(BotText.CANCEL);
         rowInLine.add(btn);
         rowsInLine.add(rowInLine);
-        
+
         keyboardMarkup.setKeyboard(rowsInLine);
         return keyboardMarkup;
     }

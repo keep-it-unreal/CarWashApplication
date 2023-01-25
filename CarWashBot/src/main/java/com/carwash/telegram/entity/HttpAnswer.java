@@ -59,7 +59,12 @@ public class HttpAnswer {
         return status;
     }
 
+    public HttpStatus getHttpStatus() {
+        return httpStatus;
+    }
     public boolean isSuccess() {
         return success;
     }
+
+
 }
