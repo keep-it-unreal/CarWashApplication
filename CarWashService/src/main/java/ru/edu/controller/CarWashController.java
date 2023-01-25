@@ -13,9 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import ru.edu.entity.CarWash;
-import ru.edu.entity.UserInfo;
 import ru.edu.entity.dto.CarWashDTO;
 import ru.edu.service.CarWashService;
 
@@ -34,9 +32,6 @@ public class CarWashController {
 
     private final CarWashService carWashService;
 
-    @Value("${outEndpoint.server}${outEndpoint.userService}")
-    private String userServiceEndpoint;
-
     @Operation(summary = "Get all carWash")
     @GetMapping
     public ResponseEntity<List<CarWash>> getAllCarWashes() {
@@ -45,11 +40,6 @@ public class CarWashController {
         return new ResponseEntity<>(carWashes, HttpStatus.OK);
     }
 
-    /***
-     * Method for getting carWash details
-     * @param carWashId - carWash id
-     * @return carWash details
-     */
     @GetMapping("/{carWashId}")
     public ResponseEntity<CarWash> getCarWashById(@PathVariable Long carWashId) {
         return new ResponseEntity<>(carWashService.findById(carWashId), HttpStatus.OK);
@@ -77,14 +67,10 @@ public class CarWashController {
 
     @GetMapping("/all-for-user-on-date")
     //Получить список всех автомоек, расположенных в городе пользователя, имеющих свободные позиции по времени на запрошенную дату
-    public ResponseEntity<Collection<CarWashDTO>> getAllCarWashesByUserAndDate(@RequestParam String username,
+    public ResponseEntity<Collection<CarWashDTO>> getAllCarWashesByUserAndDate(@RequestParam Long idUser,
                                                                                @RequestParam
                                                                                @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        UserInfo user = getUserByUsernameFromUserService(username);
-        if (user == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        Collection<CarWashDTO> resultCarWashes = carWashService.findVacantCarWashByUserAndAtDate(user, date)
+        Collection<CarWashDTO> resultCarWashes = carWashService.findVacantCarWashByUserIdAndAtDate(idUser, date)
                 .stream()
                 .map(CarWashDTO::new)
                 .collect(Collectors.toList());
@@ -93,33 +79,15 @@ public class CarWashController {
 
     @GetMapping("/near-for-user-on-date")
     //Получить список всех автомоек, расположенных в городе пользователя, ближайших к заданным координатам (не более 3), имеющих свободные позиции по времени на запрошенную дату
-    public ResponseEntity<Collection<CarWashDTO>> getNearCarWashesByUserAndDate(@RequestParam String username,
+    public ResponseEntity<Collection<CarWashDTO>> getNearCarWashesByUserAndDate(@RequestParam Long idUser,
                                                                                 @RequestParam
                                                                                 @DateTimeFormat(pattern = "dd.MM.yyyy") Date date,
                                                                                 @RequestParam Double latitude,
                                                                                 @RequestParam Double longitude) {
-        UserInfo user = getUserByUsernameFromUserService(username);
-        if (user == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        Collection<CarWashDTO> resultCarWashes = carWashService.findNearCarWashByUserAndDateAndCoordinates(user, date, latitude, longitude)
+        Collection<CarWashDTO> resultCarWashes = carWashService.findNearCarWashByUserIdAndDateAndCoordinates(idUser, date, latitude, longitude)
                 .stream()
                 .map(CarWashDTO::new)
                 .collect(Collectors.toList());
         return new ResponseEntity<>(resultCarWashes, HttpStatus.OK);
     }
-
-    private UserInfo getUserByUsernameFromUserService(String username) {
-        RestTemplate restTemplate = new RestTemplate();
-        UserInfo user = null;
-        try {
-            ResponseEntity<UserInfo> userInfoResponse = restTemplate.getForEntity(userServiceEndpoint + "/login/" + username, UserInfo.class);
-            user = userInfoResponse.getBody();
-
-        } catch (Exception exception) {
-            log.error("UserService unavailable...");
-        }
-        return user;
-    }
-
 }

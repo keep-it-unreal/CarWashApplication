@@ -41,11 +41,11 @@ public class CarWashService {
         repository.deleteById(id);
     }
 
-    public Collection<CarWash> findVacantCarWashByUserAndAtDate(UserInfo userInfo, Date date){
-        return repository.findVacantCarWashByUserIdAndAtDate(userInfo.getId(), date);
+    public Collection<CarWash> findVacantCarWashByUserIdAndAtDate(Long idUser, Date date){
+        return repository.findVacantCarWashByUserIdAndAtDate(idUser, date);
     }
-    public Collection<CarWash> findNearCarWashByUserAndDateAndCoordinates(UserInfo userInfo, Date date, Double latitude, Double longitude){
-        Collection<CarWash> carWashes = findVacantCarWashByUserAndAtDate(userInfo, date);
+    public Collection<CarWash> findNearCarWashByUserIdAndDateAndCoordinates(Long idUser, Date date, Double latitude, Double longitude){
+        Collection<CarWash> carWashes = findVacantCarWashByUserIdAndAtDate(idUser, date);
         return distanceCalculator.getNearestCarWashes(latitude,longitude, carWashes.stream().toList(), 3);
     }
 }

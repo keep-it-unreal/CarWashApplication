@@ -15,7 +15,6 @@ import java.util.List;
 public interface CarWashRepository extends JpaRepository<CarWash,Long> {
     List<CarWash> findByCity(String city);
 
-    //todo: Уточнить правильность такого запроса
     @Query(value = "select cw from time_table tt " +
             "join car_wash cw on tt.car_wash_id = cw.id " +
             "where tt.date_table = :date and tt.status_free = 1 and tt.user_info_id_user = :userId", nativeQuery=true)

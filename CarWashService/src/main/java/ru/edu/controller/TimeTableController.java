@@ -33,10 +33,6 @@ public class TimeTableController {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeTableController.class);
 
     private final TimeTableService timeTableService;
-    private final CarWashService carWashService;
-
-    @Value("${outEndpoint.server}${outEndpoint.userService}")
-    private String userServiceEndpoint;
 
     @Operation(summary = "Get all timeTable")
     @GetMapping
@@ -46,11 +42,6 @@ public class TimeTableController {
         return new ResponseEntity<>(timeTables, HttpStatus.OK);
     }
 
-    /***
-     * Method for getting timeTable details
-     * @param timeTableId - timeTable id
-     * @return timeTable details
-     */
     @GetMapping("/{timeTableId}")
     //todo: выяснить как такой PathVariable будет работать? Если будет)
     public TimeTable getTimeTableById(@PathVariable TimeTableID timeTableId) {
@@ -67,30 +58,9 @@ public class TimeTableController {
 
     @PutMapping("/order-on")
     //Записать пользователя на мойку машины
+    //Или отменить Отменить заказ пользователя, если пользователь пришел как null
     public ResponseEntity<?> updateTimeTable(@RequestBody TimeTableDTO timeTableDTO) {
-        RestTemplate restTemplate = new RestTemplate();
-        UserInfo user;
-        try {
-            ResponseEntity<UserInfo> userInfoResponse = restTemplate.getForEntity(userServiceEndpoint + "findById/" + timeTableDTO.getIdUser(), UserInfo.class);
-            user = userInfoResponse.getBody();
-
-        } catch (Exception exception) {
-            log.error("UserService unavailable...");
-            return new ResponseEntity<>("UserService unavailable, can't proceed.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        try {
-            TimeTable timeTable = TimeTable.builder()
-                    .id(new TimeTableID(timeTableDTO.getDateTable(), timeTableDTO.getIdCarWash()))
-                    .userInfo(user)
-                    .carWash(carWashService.findById(timeTableDTO.getIdCarWash()))
-                    .statusFree(timeTableDTO.getStatusFree())
-                    .statusWork(timeTableDTO.getStatusWork())
-                    .build();
-            timeTableService.update(timeTable);
-        } catch (Exception exception) {
-            log.error("Error in CarWashService...");
-            return new ResponseEntity<>("It looks like a CarWash with this id was not found.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        timeTableService.createOrDeleteByUser(timeTableDTO);
         return ResponseEntity.ok().build();
     }
 
@@ -121,13 +91,14 @@ public class TimeTableController {
         return new ResponseEntity<>(activeOrdersByUser, HttpStatus.OK);
     }
 
-    @DeleteMapping("/order_off")
+    @GetMapping("/list-order-off")
     //Получить список запланированных заказов пользователя (дата >= текущей, статус - запланировано )
-    public ResponseEntity<TimeTableDTO> abandonOrder(@RequestParam Date date,
-                                                  @RequestParam Long carWashId,
-                                                  @RequestParam Long idUser) {
-        TimeTableDTO plannedTables = new TimeTableDTO(timeTableService.abandonOrder(date, carWashId, idUser));
-        return new ResponseEntity<>(plannedTables, HttpStatus.OK);
+    public ResponseEntity<List<TimeTableDTO>> getPlannedOrders(@RequestParam Long idUser) {
+        List<TimeTableDTO> activeOrdersByUser = timeTableService.getActiveOrdersByUser(idUser)
+                .stream()
+                .map(TimeTableDTO::new)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(activeOrdersByUser, HttpStatus.OK);
     }
 
     @GetMapping("/history")

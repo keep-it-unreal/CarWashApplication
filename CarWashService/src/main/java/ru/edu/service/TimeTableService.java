@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.edu.entity.TimeTable;
 import ru.edu.entity.TimeTableID;
+import ru.edu.entity.dto.TimeTableDTO;
+import ru.edu.entity.enums.StatusFree;
+import ru.edu.entity.enums.StatusWork;
 import ru.edu.exception.ItemNotFoundException;
 import ru.edu.repository.TimeTableRepository;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -21,17 +25,15 @@ public class TimeTableService {
     }
 
     public List<TimeTable> findVacantAtDate(Date date, Integer carWashId) {
-        return repository.getByCarWashIdAndDate(date,carWashId);
+        return repository.getByCarWashIdAndDate(date, carWashId);
     }
 
-    public List<TimeTable> getActiveOrdersByUser (Long idUser){
+    public List<TimeTable> getActiveOrdersByUser(Long idUser) {
         return repository.getActiveOrdersByUser(idUser);
     }
-    public List<TimeTable> getAllOrdersByUser (Long idUser){
+
+    public List<TimeTable> getAllOrdersByUser(Long idUser) {
         return repository.getAllOrdersByUser(idUser);
-    }
-    public TimeTable abandonOrder(Date date, Long carWashId, Long idUser){
-        return repository.abandonOrder(date, carWashId, idUser);
     }
 
     public TimeTable findById(TimeTableID id) {
@@ -50,5 +52,13 @@ public class TimeTableService {
     public void deleteById(TimeTableID id) {
         findById(id);
         repository.deleteById(id);
+    }
+
+    public void createOrDeleteByUser(TimeTableDTO timeTableDTO) {
+        repository.createByUser(timeTableDTO.getDateTable(),
+                timeTableDTO.getIdCarWash(),
+                timeTableDTO.getStatusFree().getValue(),
+                timeTableDTO.getStatusWork().getValue(),
+                timeTableDTO.getIdUser());
     }
 }
