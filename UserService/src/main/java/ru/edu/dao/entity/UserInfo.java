@@ -1,11 +1,10 @@
 package ru.edu.dao.entity;
 
-
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.edu.dao.dto.UserInfoDTO;
 
-import javax.persistence.*;
 
 @Entity
 @Table(name = "USERS")
