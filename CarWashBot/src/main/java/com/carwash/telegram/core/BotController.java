@@ -29,8 +29,8 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer login(@RequestBody BotUserDto userModel) {
 
-//        String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
-        String url = "http://localhost:8080/api/v1/admin-service/userInfo/login/user";
+        String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
+//        String url = "http://localhost:8080/api/v1/admin-service/userInfo/login/user";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -61,8 +61,8 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer register(@RequestBody BotUserDto userModel) {
 
-//        URL url = new URL("http://localhost:8083/api/v1/admin-service/userInfo/register/user");
-        URL url = new URL("http://localhost:8080/api/v1/admin-service/userInfo/register/user");
+        URL url = new URL("http://localhost:8083/api/v1/admin-service/userInfo/register/user");
+//        URL url = new URL("http://localhost:8080/api/v1/admin-service/userInfo/register/user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -93,8 +93,8 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getAllCity() {
 
-//        URL url = new URL("http://localhost:8083/api/v1/admin-service/city");
-        URL url = new URL("http://localhost:8080/api/v1/admin-service/city");
+        URL url = new URL("http://localhost:8083/api/v1/admin-service/city");
+//        URL url = new URL("http://localhost:8080/api/v1/admin-service/city");
 
         CityDto[] allCityDtos;
 
