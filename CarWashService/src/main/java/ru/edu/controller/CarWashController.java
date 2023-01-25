@@ -49,8 +49,8 @@ public class CarWashController {
      * @return carWash details
      */
     @GetMapping("/{carWashId}")
-    public CarWash getCarWashById(@PathVariable long carWashId) {
-        return carWashService.findById(carWashId);
+    public ResponseEntity<CarWash> getCarWashById(@PathVariable Long carWashId) {
+        return new ResponseEntity<>(carWashService.findById(carWashId),HttpStatus.OK);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -68,7 +68,7 @@ public class CarWashController {
     }
 
     @DeleteMapping("/{carWashId}")
-    public ResponseEntity<CarWash> deleteCarWashById(@PathVariable long carWashId) {
+    public ResponseEntity<CarWash> deleteCarWashById(@PathVariable Long carWashId) {
         carWashService.deleteById(carWashId);
         return ResponseEntity.ok().build();
     }

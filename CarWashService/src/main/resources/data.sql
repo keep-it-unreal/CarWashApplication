@@ -3,7 +3,7 @@ insert into city(name)
            ('Воронеж'),
            ('Саратов');
 
-insert into user_info(name,phone,address_mail,password,role,city_id_city)
+insert into user_info(name,phone,address_mail,password,role,id_city)
     values ('owner1','8-910-001-01-01','owner1@gmail.com','123',2,1),
            ('owner2','8-910-001-01-02','owner2@gmail.com','123',2,1),
            ('owner3','8-910-001-01-03','owner3@gmail.com','123',2,1),
@@ -20,7 +20,7 @@ insert into cause_interrupt(name)
            ('Проверка из пожарной'),
            ('Ремонт');
 
-insert into car_wash(user_info_id_user,city_id_city,address,latitude,longitude,daily_start_time,daily_end_time,price)
+insert into car_wash(id_owner,id_city,address,latitude,longitude,daily_start_time,daily_end_time,price)
     values (1,1,'ул. Брянский Пост, 6, стр. 1Б',55.77348,37.533417,'06','23',200),
            (1,1,'6-я Радиальная ул., 22к1с4',55.390032,37.891846,'00','23',180),
            (1,1,'просп. Мира, вл94с1Б',55.869918,37.585602,'05','22',250),
@@ -38,7 +38,7 @@ insert into car_wash(user_info_id_user,city_id_city,address,latitude,longitude,d
            (7,3,'ул. Чапаева, 196 · 8',51.442025,45.936584,'06','22',150),
            (8,3,'ул. Радищева, 65',51.429183,45.967484,'05','23',170);
 
-insert into work_shedule(car_wash_id,monday ,tuesday ,wednesday ,thursday ,friday ,saturday ,sunday )
+insert into work_shedule(id_car_wash,monday ,tuesday ,wednesday ,thursday ,friday ,saturday ,sunday )
     values (1,0,0,0,0,0,0,0),
 	   (2,0,0,0,1,0,0,0),
 	   (3,0,0,0,0,0,0,0),

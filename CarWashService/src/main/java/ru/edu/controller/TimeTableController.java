@@ -40,6 +40,7 @@ public class TimeTableController {
      * @return timeTable details
      */
     @GetMapping("/{timeTableId}")
+    //todo: выяснить как такой PathVariable будет работать? Если будет)
     public TimeTable getTimeTableById(@PathVariable TimeTableID timeTableId) {
         return timeTableService.findById(timeTableId);
     }
@@ -65,25 +66,27 @@ public class TimeTableController {
     }
 
     @GetMapping("/byDate")
-    public ResponseEntity<List<TimeTable>> getTimeTableByDate(@PathVariable @DateTimeFormat(pattern = "dd.MM.yyyy") Date date,
-                                                        @PathVariable Integer carWashId) {
+    public ResponseEntity<List<TimeTable>> getTimeTableByDate(@RequestParam @DateTimeFormat(pattern = "dd.MM.yyyy") Date date,
+                                                        @RequestParam Integer carWashId) {
         return new ResponseEntity<>(timeTableService.findVacantAtDate(date,carWashId),HttpStatus.OK);
     }
 
     @GetMapping("/history-on")
-    public ResponseEntity<List<TimeTable>> getActiveOrders(@PathVariable Long idUser) {
-        return new ResponseEntity<>(timeTableService.getActiveOrdersByUser(idUser),HttpStatus.OK);
+    public ResponseEntity<List<TimeTable>> getActiveOrders(@RequestParam Long idUser) {
+        //todo: конвертировать в TimeTableDTO
+        List<TimeTable> activeOrdersByUser = timeTableService.getActiveOrdersByUser(idUser);
+        return new ResponseEntity<>(activeOrdersByUser,HttpStatus.OK);
     }
 
     @DeleteMapping("/order_off")
-    public ResponseEntity<TimeTable> abandonOrder(@PathVariable Date date,
-                                          @PathVariable Long carWashId,
-                                          @PathVariable Integer idUser) {
+    public ResponseEntity<TimeTable> abandonOrder(@RequestParam Date date,
+                                          @RequestParam Long carWashId,
+                                          @RequestParam Integer idUser) {
         return new ResponseEntity<>(timeTableService.abandonOrder(date, carWashId, idUser),HttpStatus.OK);
     }
 
     @GetMapping("/history-all")
-    public ResponseEntity<List<TimeTable>> getAllOrdersByUser(@PathVariable Long idUser) {
+    public ResponseEntity<List<TimeTable>> getAllOrdersByUser(@RequestParam Long idUser) {
         return new ResponseEntity<>(timeTableService.getAllOrdersByUser(idUser),HttpStatus.OK);
     }
 }

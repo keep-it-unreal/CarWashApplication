@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.CascadeType;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -23,6 +20,7 @@ public class TimeInterrupt implements Serializable {
     private Instant dateEnd;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "idCause", foreignKey = @ForeignKey(name = "FK_TIME_INTERRUPT_CAUSE_INTERRUPT"))
     private CauseInterrupt causeInterrupt;
 
 }

@@ -36,7 +36,8 @@ public class UserInfo implements Serializable {
     @Enumerated(EnumType.ORDINAL)
     private Roles role;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "id_city", nullable = false, foreignKey = @ForeignKey(name = "FK_USER_CITY"))
     private City city;
 
     public UserInfo(UserInfoDTO userInfoDTO) {

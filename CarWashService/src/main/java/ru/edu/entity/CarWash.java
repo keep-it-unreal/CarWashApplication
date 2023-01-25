@@ -1,5 +1,6 @@
 package ru.edu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class CarWash implements Serializable {
 
     @Id
+    @Column(name = "id_car_wash")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -27,16 +29,21 @@ public class CarWash implements Serializable {
     private double price;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    private UserInfo userInfo;
+    @JoinColumn(name = "id_owner", foreignKey = @ForeignKey(name = "FK_CAR_WASH_USER"))
+    @JsonIgnore
+    private UserInfo ownerInfo;
 
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_city", foreignKey = @ForeignKey(name = "FK_CAR_WASH_CITY"))
+    //@JsonIgnore
     private City city;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_car_wash", referencedColumnName = "id_car_wash")
+    @JsonIgnore
     private WorkShedule workShedule;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //orphanRemoval удалит все зависимые поля этого параметра
     private List<TimeTable> timeTableList;
-
 
 }
