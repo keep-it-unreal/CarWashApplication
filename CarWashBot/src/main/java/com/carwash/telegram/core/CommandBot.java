@@ -1,12 +1,11 @@
 package com.carwash.telegram.core;
 
 import com.carwash.telegram.commands.*;
+import com.carwash.telegram.config.BotConfig;
 import com.carwash.telegram.entity.BotUser;
 import com.carwash.telegram.entity.enums.BotUserStepService;
 import com.carwash.telegram.service.BotUserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.extensions.bots.commandbot.TelegramLongPollingCommandBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -21,35 +20,30 @@ import javax.annotation.PostConstruct;
 
 @Slf4j
 @Service
-@PropertySource("application.properties")
 public class CommandBot extends TelegramLongPollingCommandBot {
 
     private final BotUserService botUserService;
     private final BotController botController;
 
+    private final BotConfig botConfig;
+
     private HelpCommand helpCommand;
 
-    @Value("${bot.name}")
-    private String botName;
-
-    @Value("${bot.token}")
-    private String token;
-
-    public CommandBot(BotUserService botUserService, BotController botController) {
+    public CommandBot(BotUserService botUserService, BotController botController, BotConfig botConfig) {
         this.botUserService = botUserService;
         this.botController = botController;
+        this.botConfig = botConfig;
     }
 
     @Override
     public String getBotUsername() {
-        return botName;
+        return botConfig.getBotName();
     }
 
     @Override
     public String getBotToken() {
-        return token;
+        return botConfig.getToken();
     }
-
 
 
     private String getNameFromUpdate(Update update) {

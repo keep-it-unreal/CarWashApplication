@@ -1,5 +1,6 @@
 package com.carwash.telegram.core;
 
+import com.carwash.telegram.config.BotConfig;
 import com.carwash.telegram.entity.HttpAnswer;
 import com.carwash.telegram.entity.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class BotController {
 
+    private final BotConfig botConfig;
     private final RestTemplate restTemplate;
 
     /***
@@ -29,8 +31,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer login(@RequestBody BotUserDto userModel) {
 
-        String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
-//        String url = "http://localhost:8080/api/v1/admin-service/userInfo/login/user";
+        String url = "http://localhost:" + botConfig.getPortServiceUser() + "/api/v1/admin-service/userInfo/login/user";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -61,8 +62,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer register(@RequestBody BotUserDto userModel) {
 
-        URL url = new URL("http://localhost:8083/api/v1/admin-service/userInfo/register/user");
-//        URL url = new URL("http://localhost:8080/api/v1/admin-service/userInfo/register/user");
+        URL url = new URL("http://localhost:" + botConfig.getPortServiceUser() + "/api/v1/admin-service/userInfo/register/user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -93,8 +93,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getAllCity() {
 
-        URL url = new URL("http://localhost:8083/api/v1/admin-service/city");
-//        URL url = new URL("http://localhost:8080/api/v1/admin-service/city");
+        URL url = new URL("http://localhost:" + botConfig.getPortServiceUser() + "/api/v1/admin-service/city");
 
         CityDto[] allCityDtos;
 
@@ -133,7 +132,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getAllCarWash(Long idUser, String date) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/carWash/all-for-user-on-date?idUser={idUser}&date={date}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/carWash/all-for-user-on-date?idUser={idUser}&date={date}";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -181,7 +180,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getNewCarWash(Long idUser, String date, String latitude, String longitude) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/carWash/near-for-user-on-date?idUser={idUser}&date={date}&latitude={latitude}&longitude={longitude}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/carWash/near-for-user-on-date?idUser={idUser}&date={date}&latitude={latitude}&longitude={longitude}";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -226,7 +225,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getAllTime(String date, Long idCarWash ) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/byDate?date={date}&idCarWash={idCarWash}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/timeTable/byDate?date={date}&idCarWash={idCarWash}";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers  = new HttpHeaders();
@@ -261,7 +260,7 @@ public class BotController {
      */
     @SneakyThrows
     public HttpAnswer orderOn(@RequestBody TimeTableDto timeTableDto) {
-        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/order-on";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/timeTable/order-on";
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -295,7 +294,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getListOrderOn(Long idUser ) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/history-on?idUser={idUser}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/timeTable/history-on?idUser={idUser}";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers  = new HttpHeaders();
@@ -332,7 +331,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getListOrderOff(Long idUser ) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/list-order-off?idUser={idUser}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/timeTable/list-order-off?idUser={idUser}";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers  = new HttpHeaders();
@@ -369,7 +368,7 @@ public class BotController {
     @SneakyThrows
     public HttpAnswer getHistory(Long idUser ) {
 
-        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/history?idUser={idUser}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForUser() + "/api/v1/CarWash-service/timeTable/history?idUser={idUser}";
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers  = new HttpHeaders();
