@@ -18,7 +18,7 @@ public class TimeTableID implements Serializable {
 
     private Instant dateTable;
 
-    private Integer idCarWash;
+    private Long idCarWash;
 
     @Override
     public boolean equals(Object o) {

@@ -44,7 +44,4 @@ public class WorkShedule implements Serializable {
     @JoinColumn(name = "id_car_wash", referencedColumnName = "IdCarWash")
     @JsonIgnore
     private CarWash carWash;
-
-
-
 }

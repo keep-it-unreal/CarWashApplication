@@ -24,12 +24,6 @@ public class City implements Serializable {
     @Column(unique = true, nullable = false)
     private String name;
 
-    //@OneToMany(cascade = CascadeType.ALL, mappedBy = "city")
-    //private List<UserInfo> userInfoList;
-
-    //@OneToMany(cascade = CascadeType.ALL, mappedBy = "city")
-    //private List<CarWash> carWashesList;
-
     public City(CityDTO cityDTO){
         this.id = cityDTO.getId();
         this.name = cityDTO.getName();

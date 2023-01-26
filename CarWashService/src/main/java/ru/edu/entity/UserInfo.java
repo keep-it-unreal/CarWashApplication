@@ -1,5 +1,7 @@
 package ru.edu.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.edu.entity.dto.UserInfoDTO;
@@ -11,6 +13,8 @@ import java.io.Serializable;
 @Entity
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class UserInfo implements Serializable {
 
     @Id
@@ -32,21 +36,9 @@ public class UserInfo implements Serializable {
     @Enumerated(EnumType.ORDINAL)
     private Roles role;
 
-    //private Integer IdCity;
-
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_city", nullable = false, foreignKey = @ForeignKey(name = "FK_USER_CITY"))
     private City city;
-
-    /*
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "ownerInfo")
-    @JsonIgnore
-    private List<CarWash> carWashesList;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userInfo")
-    @JsonIgnore
-    private List<TimeTable> timeTableList;
-    */
 
     public UserInfo(UserInfoDTO userInfoDTO) {
         this.id = userInfoDTO.getId();

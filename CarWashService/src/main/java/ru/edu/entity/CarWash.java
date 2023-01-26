@@ -28,9 +28,6 @@ public class CarWash implements Serializable {
 
     private double price;
 
-    //private Long idOwner;
-    //private Long idCity;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_owner", foreignKey = @ForeignKey(name = "FK_CAR_WASH_USER"))
     @JsonIgnore
@@ -38,7 +35,6 @@ public class CarWash implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_city", foreignKey = @ForeignKey(name = "FK_CAR_WASH_CITY"))
-    //@JsonIgnore
     private City city;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -46,10 +42,7 @@ public class CarWash implements Serializable {
     @JsonIgnore
     private WorkShedule workShedule;
 
-    /*
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "carWash")
-    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true) //orphanRemoval удалит все зависимые поля этого параметра
     private List<TimeTable> timeTableList;
-     */
 
 }
