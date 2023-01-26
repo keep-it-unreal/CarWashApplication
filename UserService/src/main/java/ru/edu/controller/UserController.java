@@ -57,7 +57,7 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.resolve(404)).body("User not found");
             }
         } catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.resolve(404)).body(new RuntimeException(e));
+            return ResponseEntity.status(HttpStatus.resolve(404)).body(e);
         }
     }
     @PostMapping(value = "/login/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
