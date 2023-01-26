@@ -26,7 +26,7 @@ public class TimeTableDTO {
         this.dateTable = timeTable.getID().getDateTable();
         this.idCarWash = timeTable.getCarWash().getId();
         this.address = timeTable.getCarWash().getAddress();
-        this.idUser = timeTable.getUserInfo().getId();
+        this.idUser = timeTable.getUserInfo() != null ? timeTable.getUserInfo().getId() : null;
         this.statusFree = timeTable.getStatusFree();
         this.statusWork = timeTable.getStatusWork();
     }

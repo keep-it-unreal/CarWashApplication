@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import ru.edu.entity.CarWash;
+import ru.edu.entity.UserInfo;
 import ru.edu.entity.dto.CarWashDTO;
 import ru.edu.service.CarWashService;
 
@@ -30,6 +33,8 @@ public class CarWashController {
     private static final Logger LOGGER = LoggerFactory.getLogger(CarWashController.class);
 
     private final CarWashService carWashService;
+    @Value("${outEndpoint.userController.findById}")
+    private String urlUserControllerFindById;
 
     @Operation(summary = "Get all carWash")
     @GetMapping
@@ -69,11 +74,20 @@ public class CarWashController {
     public ResponseEntity<Collection<CarWashDTO>> getAllCarWashesByUserAndDate(@RequestParam Long idUser,
                                                                                @RequestParam
                                                                                @DateTimeFormat(pattern = "dd.MM.yyyy") Date date) {
-        Collection<CarWashDTO> resultCarWashes = carWashService.findVacantCarWashByUserIdAndAtDate(idUser, date)
-                .stream()
-                .map(CarWashDTO::new)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(resultCarWashes, HttpStatus.OK);
+
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<UserInfo> botUserResponse = restTemplate.getForEntity(urlUserControllerFindById + idUser, UserInfo.class);
+
+            Collection<CarWashDTO> resultCarWashes = carWashService.findVacantCarWashByUserIdAndAtDate(botUserResponse.getBody().getCity().getId(), date)
+                    .stream()
+                    .map(CarWashDTO::new)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(resultCarWashes, HttpStatus.OK);
+        } catch (Exception exception) {
+            log.error("UserService unavailable. idUser = {} not found, or idCity not found", idUser);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/near-for-user-on-date")
@@ -83,10 +97,18 @@ public class CarWashController {
                                                                                 @DateTimeFormat(pattern = "dd.MM.yyyy") Date date,
                                                                                 @RequestParam Double latitude,
                                                                                 @RequestParam Double longitude) {
-        Collection<CarWashDTO> resultCarWashes = carWashService.findNearCarWashByUserIdAndDateAndCoordinates(idUser, date, latitude, longitude)
-                .stream()
-                .map(CarWashDTO::new)
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(resultCarWashes, HttpStatus.OK);
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<UserInfo> botUserResponse = restTemplate.getForEntity(urlUserControllerFindById + idUser, UserInfo.class);
+
+            Collection<CarWashDTO> resultCarWashes = carWashService.findNearCarWashByUserIdAndDateAndCoordinates(botUserResponse.getBody().getCity().getId(), date, latitude, longitude)
+                    .stream()
+                    .map(CarWashDTO::new)
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(resultCarWashes, HttpStatus.OK);
+        } catch (Exception exception) {
+            log.error("UserService unavailable. idUser = {} not found, or idCity not found", idUser);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

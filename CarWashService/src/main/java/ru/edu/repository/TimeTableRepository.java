@@ -7,9 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.edu.entity.TimeTable;
 import ru.edu.entity.TimeTableID;
-import ru.edu.entity.dto.TimeTableDTO;
-import ru.edu.entity.enums.StatusFree;
-import ru.edu.entity.enums.StatusWork;
 
 import javax.transaction.Transactional;
 import java.time.Instant;
@@ -22,21 +19,21 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, TimeTableI
     // для выбранной мойки на выбранную дату уже добавлялись записи в расписание (да >0, нет -0)
     long countByIdIdCarWashAndIdDateTable(Long idCarWash, Instant dBegin);
 
-    //todo: и здесь уточнить насчет правильности запросов
     @Query(value = "select * from time_table " +
-            "where car_wash_id = :carWashId and date_trunc('day',date_table) = date_trunc('day',':date')", nativeQuery = true)
+            "where id_car_wash = :carWashId and cast(date_table as date) = cast(:date as date) and status_free = 0 " +
+            "order by date_table", nativeQuery = true)
     List<TimeTable> getByCarWashIdAndDate(@Param("date") Date date, @Param("carWashId") Integer carWashId);
 
     @Query(value = "select * from time_table " +
-            "where id_user = :idUser and date_table >= now()", nativeQuery = true)
+            "where id_user = :idUser and date_table >= now() order by date_table", nativeQuery = true)
     List<TimeTable> getActiveOrdersByUser(@Param("idUser") Long idUser);
 
     @Query(value = "select * from time_table " +
-            "where id_user = :idUser and date_table >= now() and status_work = 1", nativeQuery = true)
+            "where id_user = :idUser and date_table >= now() and status_work = 1 order by date_table", nativeQuery = true)
     List<TimeTable> getActiveOrdersByUserAndStatusPlanned(@Param("idUser") Long idUser);
 
     @Query(value = "select * from time_table " +
-            "where id_user = :idUser", nativeQuery = true)
+            "where id_user = :idUser order by date_table", nativeQuery = true)
     List<TimeTable> getAllOrdersByUser(@Param("idUser") Long idUser);
 
     @Modifying
