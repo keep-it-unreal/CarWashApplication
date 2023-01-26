@@ -16,4 +16,12 @@ public class BotConfig {
     @Value("${bot.token}")
     private String token;
 
+    @Value("${service.User.port}")
+    private String portServiceUser;
+
+    @Value("${service.CarWashForUser.port}")
+    private String portServiceCarWashForUser;
+
+    @Value("${service.CarWashForOwner.port}")
+    private String portServiceCarWashForOwner;
 }
