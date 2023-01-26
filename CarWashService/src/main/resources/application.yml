@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
-    password: 123456
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -36,3 +36,7 @@ service:
   title: CarWash service Api
   description: CarWash service description
   version: 1.0 BETA
+
+inEndpoint:
+  carWashController: /api/v1/CarWash-service/carWash
+  timeTableController: /api/v1/CarWash-service/timeTable

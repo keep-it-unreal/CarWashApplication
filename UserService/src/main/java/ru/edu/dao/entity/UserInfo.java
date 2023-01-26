@@ -7,12 +7,13 @@ import ru.edu.dao.dto.UserInfoDTO;
 
 
 @Entity
-@Table(name = "USERS")
+@Table(name = "user_info")
 @Data
 @NoArgsConstructor
 public class UserInfo {
 
     @Id
+    @Column(name = "id_user")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name = "address_mail")
