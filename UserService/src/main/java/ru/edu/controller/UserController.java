@@ -46,11 +46,25 @@ public class UserController {
         return user;
     }
 
-    @PostMapping(value = "/login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserInfo> login(@RequestBody UserInfoDTO userInfoDTO){
+    @PostMapping(value = "/login/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity loginUser(@RequestBody UserInfoDTO userInfoDTO){
         UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
         LOGGER.info("logging by name and phone: {}", userInfo);
-        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        if(userInfo.getRole() == UserRoles.USER) {
+            return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.resolve(404)).body("User not found");
+        }
+    }
+    @PostMapping(value = "/login/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity loginOwner(@RequestBody UserInfoDTO userInfoDTO){
+        UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
+        LOGGER.info("logging by name and phone: {}", userInfo);
+        if(userInfo.getRole() == UserRoles.OWNER) {
+            return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        } else {
+            return ResponseEntity.status(HttpStatus.resolve(404)).body("Owner not found");
+        }
     }
 
     @GetMapping("/getAllUsers")
