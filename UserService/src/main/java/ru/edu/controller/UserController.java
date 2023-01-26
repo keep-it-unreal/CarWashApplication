@@ -48,12 +48,16 @@ public class UserController {
 
     @PostMapping(value = "/login/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity loginUser(@RequestBody UserInfoDTO userInfoDTO){
-        UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
-        LOGGER.info("logging by name and phone: {}", userInfo);
-        if(userInfo.getRole() == UserRoles.USER) {
-            return new ResponseEntity<>(userInfo, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.resolve(404)).body("User not found");
+        try{
+            UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
+            LOGGER.info("logging by name and phone: {}", userInfo);
+            if(userInfo.getRole() == UserRoles.USER) {
+                return new ResponseEntity<>(userInfo, HttpStatus.OK);
+            } else {
+                return ResponseEntity.status(HttpStatus.resolve(404)).body("User not found");
+            }
+        } catch (RuntimeException e){
+            return ResponseEntity.status(HttpStatus.resolve(404)).body(new RuntimeException(e));
         }
     }
     @PostMapping(value = "/login/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
