@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.bots.AbsSender;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -39,8 +38,8 @@ abstract class AnswerCommand extends BotCommand {
         }
     }
 
-    // public abstract void execute(AbsSender absSender, User user, Chat chat, String[] strings);
     public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
+        /*
         StringBuilder sb = new StringBuilder();
 
         SendMessage message = new SendMessage();
@@ -48,29 +47,12 @@ abstract class AnswerCommand extends BotCommand {
 
         message.setText(sb.toString());
         execute(absSender, message, user);
-    }
 
-
-    /*
-    @Override
-    public void processMessage(AbsSender absSender, Message message, String[] arguments) {
-        //execute(absSender, message.getFrom(), message.getChat(), message.getMessageId(), arguments);
-        execute(absSender, message.getFrom(), message.getChat(), arguments);
+         */
     }
-    @Override
-    public String getCommandIdentifier() {
-        return commandIdentifier;
-    }
-
-     */
 
     protected String getNameFromUser(User user) {
-        String name = new StringBuilder()
-                .append(user.getFirstName())
-                .append(" ")
-                .append(user.getLastName())
-                .toString();
-        return name;
+        return user.getFirstName() + " "+ user.getLastName();
     }
 
 

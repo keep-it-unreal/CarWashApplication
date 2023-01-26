@@ -32,10 +32,24 @@ logging:
       springframework:
         web:
           client=DEBUG:
+          client:
+              RestTemplate=DEBUG:
+      apache:
+        http=DEBUG:
+    httpclient:
+      wire=DEBUG:
   file:
     name: carServiceBot.log
     path: ./
 
+log4j:
+  logger:
+    httpclient:
+      wire=DEBUG:
 
+    org:
+      springframework:
+        web:
+          client=DEBUG:
 
 

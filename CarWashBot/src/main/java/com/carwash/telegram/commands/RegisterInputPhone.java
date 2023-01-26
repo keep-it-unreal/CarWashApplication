@@ -8,6 +8,7 @@ import com.carwash.telegram.entity.dto.BotUserDto;
 import com.carwash.telegram.entity.dto.CityDto;
 import com.carwash.telegram.entity.enums.BotUserStepService;
 import com.carwash.telegram.service.BotUserService;
+import com.carwash.telegram.util.UncheckedConversion;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
@@ -23,8 +24,6 @@ import java.util.regex.Pattern;
 
 @Slf4j
 public final class RegisterInputPhone extends AnswerCommand {
-
-    List<CityDto> allCity;
 
     // обязательно нужно вызвать конструктор суперкласса,
     // передав в него имя и описание команды
@@ -76,25 +75,28 @@ public final class RegisterInputPhone extends AnswerCommand {
             botUser.setStepService(BotUserStepService.NONE);
             botUserService.save(botUser);
 
-        } else {
-
-            HttpAnswer httpAnswer1 = botController.getAllCity();
-            if (httpAnswer1.isSuccess()) {
-                allCity = (List<CityDto>) httpAnswer1.getObjectList();
-                message = getSelectCommandButton(chat,allCity);
-                execute(absSender, message, user);
-
-                botUser.setStepService(BotUserStepService.REGISTRY_SELECT_CITY);
-                botUserService.save(botUser);
-
-            } else {
-                message.setText(httpAnswer1.getStatus());
-                execute(absSender, message, user);
-
-                botUser.setStepService(BotUserStepService.NONE);
-                botUserService.save(botUser);
-            }
+            return;
         }
+
+        HttpAnswer httpAnswer1 = botController.getAllCity();
+        if (!httpAnswer1.isSuccess()) {
+            message.setText(httpAnswer1.getStatus());
+            execute(absSender, message, user);
+
+            botUser.setStepService(BotUserStepService.NONE);
+            botUserService.save(botUser);
+
+            return;
+        }
+
+        List rawList = httpAnswer1.getObjectList();
+        List<CityDto> allCity = UncheckedConversion.castList(CityDto.class, rawList);
+
+        message = getSelectCommandButton(chat,allCity);
+        execute(absSender, message, user);
+
+        botUser.setStepService(BotUserStepService.REGISTRY_SELECT_CITY);
+        botUserService.save(botUser);
     }
 
     /**
@@ -104,7 +106,7 @@ public final class RegisterInputPhone extends AnswerCommand {
      */
     private boolean ValidatePhone(String text) {
 
-        if (text == null || text == "") {
+        if (text == null || text.equals("")) {
             return false;
         }
 

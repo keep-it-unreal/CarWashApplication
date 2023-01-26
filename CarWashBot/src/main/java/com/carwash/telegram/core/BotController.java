@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -19,7 +21,7 @@ public class BotController {
 
     private final RestTemplate restTemplate;
 
-    /**
+    /***
      * Вход пользователя в сервисе по имени и номеру телефона
      * @param userModel - dto пользователя ((имя, телефон)
      * @return id пользователя, если пользователь зарегистрирован в сервисе, 0 - если нет
@@ -28,6 +30,7 @@ public class BotController {
     public HttpAnswer login(@RequestBody BotUserDto userModel) {
 
         String url = "http://localhost:8083/api/v1/admin-service/userInfo/login/user";
+//        String url = "http://localhost:8080/api/v1/admin-service/userInfo/login/user";
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -44,14 +47,14 @@ public class BotController {
             }
 
         } catch (Exception ex) {
-            log.info("Method BotController.login(). Exception = " + ex);
+            log.info("Exception = " + ex);
         }
 
         return httpAnswer;
     }
 
-    /**
-     * Регистрация пользователя в сервисе (имя, телефон, idCity)
+    /***
+     * Регистрация пользователя в сервисе (имя, телефон, id города)
      * @param userModel - dto пользователя
      * @return id пользователя, если пользователь зарегистрирован в сервисе, 0 - если нет
      */
@@ -59,6 +62,7 @@ public class BotController {
     public HttpAnswer register(@RequestBody BotUserDto userModel) {
 
         URL url = new URL("http://localhost:8083/api/v1/admin-service/userInfo/register/user");
+//        URL url = new URL("http://localhost:8080/api/v1/admin-service/userInfo/register/user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
@@ -75,13 +79,13 @@ public class BotController {
             }
 
         } catch (Exception ex) {
-            log.info("Method BotController.register(). Exception = " + ex);
+            log.info("Exception = " + ex);
         }
 
         return httpAnswer;
     }
 
-    /**
+    /***
      * Получение списка всх городов
      *
      * @return список городо
@@ -90,16 +94,13 @@ public class BotController {
     public HttpAnswer getAllCity() {
 
         URL url = new URL("http://localhost:8083/api/v1/admin-service/city");
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+//        URL url = new URL("http://localhost:8080/api/v1/admin-service/city");
 
-        CityDto[] allCityDtos = {};
+        CityDto[] allCityDtos;
 
         HttpAnswer httpAnswer = new HttpAnswer();
         try {
             RestTemplate restTemplate = new RestTemplate();
-
-            //CityListDto responce = restTemplate.getForObject(url.toURI(),CityListDto.class);
 
             ResponseEntity<CityDto[]> response =
                     restTemplate.getForEntity(
@@ -115,52 +116,107 @@ public class BotController {
             }
 
         } catch (Exception ex) {
-            log.error("Method BotController.getAllCity(). Exception " + ex);
+            log.error("Exception " + ex);
         }
 
         return httpAnswer;
     }
 
-    /**
+    /***
      * Получить список всех моек,
      * находящихсы в городе, в котором зарегистрирован пользователь
      * у которых есть незанятое время в выбранную пользователем дату
-     * @param nameUser - полное имя пользователя
+     * @param idUser - id пользователя
      * @param date - выбранная дата
      * @return - список свободных моек в городе пользователя
      */
     @SneakyThrows
-    public List<CarWashDto> getAllCarWash(String nameUser, String date) {
+    public HttpAnswer getAllCarWash(Long idUser, String date) {
 
-        URL url = new URL("http://localhost:8080/api/v1/CarWash-service/carWash/all-for-user-on-date?user={nameUser}&date={date}");
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        String url = "http://localhost:8080/api/v1/CarWash-service/carWash/all-for-user-on-date?idUser={idUser}&date={date}";
 
-        CarWashDto[] carWashDtos = {};
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String,String> param = new HashMap<>();
+        param.put("idUser", String.valueOf(idUser));
+        param.put("date",date);
+
+        HttpEntity<CarWashDto[]> requestEntity = new HttpEntity<>(null, headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<CarWashDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, CarWashDto[].class, param);
 
-            /*
-            Map<String,String> map = new HashMap<>();
-            map.put("nameUser",nameUser);
-            map.put("date",date);
-             */
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
 
-            //CarWashListDto responce = restTemplate.getForObject(url.toString(),CarWashListDto.class,map);
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
 
-            carWashDtos = restTemplate.getForObject(url.toString(),CarWashDto[].class,
-                    nameUser, date);
+            }
 
         } catch (Exception ex) {
-            log.error("Method getAllCity. Exception " + ex);
+            log.error("Exception " + ex);
+
         }
 
-        return List.of(carWashDtos);
-
+        return httpAnswer;
     }
 
-    /**
+    /***
+     * Получить список всех моек,
+     * находящихсы в городе, в котором зарегистрирован пользователь
+     * в максимальной близости заданного координатами местонахождения
+     * у которых есть незанятое время в выбранную пользователем дату
+     * @param idUser - id пользователя
+     * @param date - выбранная дата
+     * @param latitude - широта
+     * @param longitude - долгота
+     * @return - список близлежащих моек, у которых есть незанятое время в заданную дату
+     */
+    @SneakyThrows
+    public HttpAnswer getNewCarWash(Long idUser, String date, String latitude, String longitude) {
+
+        String url = "http://localhost:8080/api/v1/CarWash-service/carWash/near-for-user-on-date?idUser={idUser}&date={date}&latitude={latitude}&longitude={longitude}";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        Map<String,String> param = new HashMap<>();
+        param.put("idUser", String.valueOf(idUser));
+        param.put("date",date);
+        param.put("latitude", latitude);
+        param.put("longitude",longitude);
+
+        HttpEntity<CarWashDto[]> requestEntity = new HttpEntity<>(null,headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
+
+        try {
+            ResponseEntity<CarWashDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, CarWashDto[].class, param);
+
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
+
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
+
+            }
+
+        } catch (Exception ex) {
+            log.error("Exception " + ex);
+
+        }
+        return httpAnswer;
+    }
+
+    /***
      * Получить список всех свободных позиций времени для записи пользователя на автомойку
      * для выбранной пользователем даты, мойки
      * @param date - выбранная дата
@@ -168,29 +224,37 @@ public class BotController {
      * @return - список свободных позиций времени
      */
     @SneakyThrows
-    public List<TimeTableDto> getAllTime(String date, Long idCarWash ) {
+    public HttpAnswer getAllTime(String date, Long idCarWash ) {
 
-        URL url = new URL("http://localhost:8080/api/v1/CarWash-service/timeTable/?date={date}&idCarWash={idCarWash}");
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/byDate?date={date}&idCarWash={idCarWash}";
+        RestTemplate restTemplate = new RestTemplate();
 
-        TimeTableDto[] timeTableDtos = {};
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<TimeTableDto[]> requestEntity = new HttpEntity<>(null,headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
 
         try {
-            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<TimeTableDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, TimeTableDto[].class, date, idCarWash);
 
-            timeTableDtos = restTemplate.getForObject(url.toString(),TimeTableDto[].class,
-                    date, idCarWash);
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
+
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
+
+            }
 
         } catch (Exception ex) {
-            log.error("Method getAllCity. Exception " + ex);
+            log.error("Exception " + ex);
+
         }
-
-        return List.of(timeTableDtos);
-
+        return httpAnswer;
     }
 
-    /**
+    /***
      * Оформление заказа пользователдя на мойку машины
      * @param timeTableDto - данные заказа
      * @return true - заказ оформлен успешно
@@ -200,106 +264,138 @@ public class BotController {
         String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/order-on";
 
         RestTemplate restTemplate = new RestTemplate();
-        //restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
         HttpHeaders headers = new HttpHeaders();
-        //headers.set("X-TP-DeviceID", Global.deviceID);
-        //Map<String, String> param = new HashMap<String, String>();
-        //param.put("id","10")
 
-        HttpEntity<TimeTableDto> requestEntity = new HttpEntity<TimeTableDto>(timeTableDto,headers);
+        HttpEntity<TimeTableDto> requestEntity = new HttpEntity<>(timeTableDto, headers);
         HttpAnswer httpAnswer = new HttpAnswer();
 
         try {
-            //ResponseEntity<TimeTableDto> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, TimeTableDto[].class, param);
             ResponseEntity<TimeTableDto[]> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, TimeTableDto[].class);
 
             httpAnswer.setHttpStatus(response.getStatusCode());
             if (httpAnswer.isSuccess()) {
-                if (response.getBody() != null) {
-                    httpAnswer.setObjectList(List.of(response.getBody()));
-                }
+                log.info("successful");
             }
 
         } catch (Exception ex) {
-            log.error("Method BotController.orderOn(). Exception " + ex);
+            log.error("Exception " + ex);
 
         }
 
         return httpAnswer;
     }
 
-    /*
+    /***
+     * Получить список всех активных заказов пользователя
+     * (дата >= текущей )
+     * @param idUser - id пользователя
+     * @return - список активных заказов пользователя
+     */
     @SneakyThrows
-    public List<CarWashDto> getNeaCarWash(String lattid, String longt) {
-        List<CarWashDto> neaCarWashModelList = new ArrayList<>();
+    public HttpAnswer getListOrderOn(Long idUser ) {
 
-        String urlParameters  = String.format("?latitude=%s&longitude=%s&date=%s", lattid, longt, currDate);
-        URL url = new URL("http://localhost:8080/car-wash/nearest-free-car-washes-by-date" + urlParameters);
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
+        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/history-on?idUser={idUser}";
+        RestTemplate restTemplate = new RestTemplate();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String inputLine;
-        StringBuilder response = new StringBuilder();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        JSONArray jsonArray = new JSONArray(response.toString());
-        in.close();
+        HttpEntity<TimeTableDto[]> requestEntity = new HttpEntity<>(null,headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
 
-        for (Object jo : jsonArray) {
-            JSONObject jsonObject = (JSONObject) jo;
-            CarWashDto neaCarWashModel = new CarWashDto();
-            neaCarWashModel.setId(jsonObject.getInt(TAG_ID));
-            neaCarWashModel.setAddress(jsonObject.getString(TAG_ADDRESS));
+        try {
+            ResponseEntity<TimeTableDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, TimeTableDto[].class, idUser);
 
-            if (!jsonObject.isNull(TAG_PRICE)) {
-                neaCarWashModel.setPrice(jsonObject.getDouble(TAG_PRICE));
-            } else {
-                neaCarWashModel.setPrice(0);
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
+
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
+
             }
 
-            neaCarWashModelList.add(neaCarWashModel);
+        } catch (Exception ex) {
+            log.error("Exception " + ex);
+
         }
-
-        return neaCarWashModelList;
+        return httpAnswer;
     }
 
+    /***
+     * Получить список запоанированных заказов пользователя
+     * (дата >= текущей, статус - запланировано )
+     * @param idUser - id пользователя
+     * @return - список активных заказов пользователя
      */
-
-    /*
     @SneakyThrows
-    public String createOrder(Long carWashId) {
-        URL url = new URL("http://localhost:8080/order/create");
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
+    public HttpAnswer getListOrderOff(Long idUser ) {
 
-        JsonObject jsonObject = new com.google.gson.JsonObject();
-        //jsonObject.addProperty("userId", userSignUpId);
-        jsonObject.addProperty("status", "Новый");
-        jsonObject.addProperty("carWashId", carWashId);
-        jsonObject.addProperty("date", currDate);
+        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/list-order-off?idUser={idUser}";
+        RestTemplate restTemplate = new RestTemplate();
 
-        OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
-        wr.write(jsonObject.toString());
-        wr.flush();
-        wr.close();
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        InputStream in = new BufferedInputStream(connection.getInputStream());
-        String result = org.apache.commons.io.IOUtils.toString(in, "UTF-8");
-        JSONObject jsonResultObject = new JSONObject(result);
+        HttpEntity<TimeTableDto[]> requestEntity = new HttpEntity<>(null,headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
 
-        in.close();
-        connection.disconnect();
+        try {
+            ResponseEntity<TimeTableDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, TimeTableDto[].class, idUser);
 
-        return BotText.SELECT_ALL;
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
+
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
+
+            }
+
+        } catch (Exception ex) {
+            log.error("Exception " + ex);
+
+        }
+        return httpAnswer;
     }
 
+    /***
+     * Получить историю всех заказов пользователя
+     * (дата >= текущей )
+     * @param idUser - id пользователя
+     * @return - список активных заказов пользователя
      */
+    @SneakyThrows
+    public HttpAnswer getHistory(Long idUser ) {
+
+        String url = "http://localhost:8080/api/v1/CarWash-service/timeTable/history?idUser={idUser}";
+        RestTemplate restTemplate = new RestTemplate();
+
+        HttpHeaders headers  = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<TimeTableDto[]> requestEntity = new HttpEntity<>(null,headers);
+        HttpAnswer httpAnswer = new HttpAnswer();
+
+        try {
+            ResponseEntity<TimeTableDto[]> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, TimeTableDto[].class, idUser);
+
+            httpAnswer.setHttpStatus(response.getStatusCode());
+            if (httpAnswer.isSuccess()) {
+
+                if (response.getBody() != null) {
+                    httpAnswer.setObjectList(List.of(response.getBody()));
+                }
+
+            }
+
+        } catch (Exception ex) {
+            log.error("Exception " + ex);
+
+        }
+        return httpAnswer;
+    }
 
 
 }

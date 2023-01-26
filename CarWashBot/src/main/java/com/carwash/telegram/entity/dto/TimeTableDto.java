@@ -4,11 +4,6 @@ import com.carwash.telegram.entity.enums.StatusFree;
 import com.carwash.telegram.entity.enums.StatusWork;
 import lombok.Data;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 @Data
@@ -19,6 +14,7 @@ public class TimeTableDto {
 
     private Long idCarWash;
 
+    private String address;
     private Long idUser;
 
     private StatusFree statusFree;

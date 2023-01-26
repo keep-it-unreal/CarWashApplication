@@ -11,60 +11,51 @@ import com.carwash.telegram.util.UncheckedConversion;
 import lombok.extern.slf4j.Slf4j;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Chat;
-import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.bots.AbsSender;
+
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Slf4j
-public final class OrderOnSelectCarWashCommand extends AnswerCommand {
-
+public final class OrderOffCommand extends SimpleCommand {
 
     // обязательно нужно вызвать конструктор суперкласса,
     // передав в него имя и описание команды
-    public OrderOnSelectCarWashCommand(BotUserService botUserService,
-                                       BotController botController) {
-        super("order_on_select_car_wash", "Выбор автомойки для заказа\n", botUserService, botController);
+    public OrderOffCommand(BotUserService botUserService,
+                           BotController botController) {
+        super("off", "Отменить заказ\n", botUserService, botController);
     }
 
     /**
-     * обработка сообщения, введенного пользователем
+     * реализованный метод класса BotCommand, в котором обрабатывается команда, введенная пользователем
      * @param absSender - отправляет ответ пользователю
-     * @param update - сообщение
      * @param user - пользователь, который выполнил команду
-     * @param botUser - данные, связанные с действиями пользователя
+     * @param chat - чат бота и пользователя
+     * @param strings - аргументы, переданные с командой
      */
+    @Override
+    public void execute(AbsSender absSender, User user, Chat chat, String[] strings) {
 
-
-    public void execute(AbsSender absSender, Update update, User user, BotUser botUser) {
-
-        String callbackData = update.getCallbackQuery().getData();
+        log.info("COMMAND_PROCESSING userId = {} commandId = {}", user.getId(), getCommandIdentifier());
 
         SendMessage answer = new SendMessage();
-        answer.setChatId(update.getCallbackQuery().getMessage().getChat().getId());
+        answer.setChatId(chat.getId().toString());
 
-        if (callbackData.equals(BotText.CANCEL)) {
+        BotUser botUser = botUserService.getBotUser(getNameFromUser(user));
 
-            botUser.setStepService(BotUserStepService.NONE);
-            botUserService.save(botUser);
-
-            answer.setText(BotText.CANCEL_USER);
-
+        if(!botUser.isIslogin()) {
+            log.info("User {} is trying to send message without starting the bot!", user.getId());
+            answer.setText(BotText.LOGIN_OR_REGISTRY);
             execute(absSender, answer, user);
             return;
-
         }
 
-        botUser.setIdCarWash(Long.valueOf(callbackData));
-        botUser = botUserService.update(botUser);
-        botUser.setStepService(BotUserStepService.ORDER_ON_SELECT_TIME);
-        botUserService.save(botUser);
+        //botUserService.setServiceStep( botUser.getId(), BotUserStepService.ORDER_OFF);
 
-        HttpAnswer httpAnswer = botController.getAllTime(botUser.getDateOrder(), botUser.getIdCarWash());
+        HttpAnswer httpAnswer = botController.getListOrderOff(botUser.getIdUser());
 
         if (!httpAnswer.isSuccess()) {
             answer.setText(httpAnswer.getStatus());
@@ -72,22 +63,36 @@ public final class OrderOnSelectCarWashCommand extends AnswerCommand {
 
             botUser.setStepService(BotUserStepService.NONE);
             botUserService.save(botUser);
-
             return;
         }
 
         List rawList = httpAnswer.getObjectList();
         List<TimeTableDto> allTimeTable = UncheckedConversion.castList(TimeTableDto.class, rawList);
 
-        answer = getSelectCommandButton(update.getCallbackQuery().getMessage().getChat(), allTimeTable);
+        if (allTimeTable.size() == 0) {
+            answer.setText(BotText.LIST_ACTIVE_ORDER_EMPTY);
+            execute(absSender, answer, user);
+
+            botUser.setStepService(BotUserStepService.NONE);
+            botUserService.save(botUser);
+            return;
+        }
+
+        answer = getSelectCommandButton(chat, allTimeTable);
         execute(absSender, answer, user);
+
+        botUser.setStepService(BotUserStepService.ORDER_OFF_SELECT_ORDER);
+        botUserService.save(botUser);
+
     }
 
     public SendMessage getSelectCommandButton(Chat chat, List<TimeTableDto> allTimeTable) {
         SendMessage message = new SendMessage();
         long chatId = chat.getId();
         message.setChatId(String.valueOf(chatId));
-        message.setText(BotText.SELECT_TIME);
+
+        //message.setText(BotText.SELECT_TIME);
+        message.setText(BotText.LIST_ACTIVE_ORDER);
 
         InlineKeyboardMarkup keyboardMarkup = getInlineKeyboard(allTimeTable);
         message.setReplyMarkup(keyboardMarkup);
@@ -103,31 +108,29 @@ public final class OrderOnSelectCarWashCommand extends AnswerCommand {
         InlineKeyboardButton btn;
         String time;
 
-        rowInLine = new ArrayList<>();
-        for (int i=0; i < allTimeTable.size(); i++) {
+        StringBuilder sb;
 
-            btn = new InlineKeyboardButton();
-            time = allTimeTable.get(i).getDateTable();
-            btn.setText(time.substring(11, 16));
-            btn.setCallbackData(allTimeTable.get(i).getDateTable());
+        for (TimeTableDto timeTableDto: allTimeTable) {
+
+            rowInLine = new ArrayList<>();
+
+            btn =  new InlineKeyboardButton();
+            time = timeTableDto.getDateTable();
+
+            sb = new StringBuilder();
+
+            sb.append(time, 0, 16)
+                    .append(" ")
+                    .append(timeTableDto.getAddress());
+
+            btn.setText(sb.toString());
+            btn.setCallbackData(timeTableDto.getDateTable());
             rowInLine.add(btn);
 
-            if (((i+1) % 5 == 0)) {
-                rowsInLine.add(rowInLine);
-                rowInLine = new ArrayList<>();
-            }
+            rowsInLine.add(rowInLine);
         }
-        rowsInLine.add(rowInLine);
-
-        rowInLine = new ArrayList<>();
-        btn =  new InlineKeyboardButton();
-        btn.setText(BotText.CANCEL);
-        btn.setCallbackData(BotText.CANCEL);
-        rowInLine.add(btn);
-        rowsInLine.add(rowInLine);
 
         keyboardMarkup.setKeyboard(rowsInLine);
         return keyboardMarkup;
     }
-
 }
