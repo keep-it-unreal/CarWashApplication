@@ -3,7 +3,6 @@ package ru.edu.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.edu.entity.CarWash;
-import ru.edu.entity.UserInfo;
 import ru.edu.exception.ItemNotFoundException;
 import ru.edu.repository.CarWashRepository;
 import ru.edu.util.DistanceCalculator;
@@ -40,11 +39,11 @@ public class CarWashService {
         repository.deleteById(id);
     }
 
-    public Collection<CarWash> findVacantCarWashByUserIdAndAtDate(Long idUser, Date date){
-        return repository.findVacantCarWashByUserIdAndAtDate(idUser, date);
+    public Collection<CarWash> findVacantCarWashByUserIdAndAtDate(Long idCity, Date date){
+        return repository.findVacantCarWashByUserIdAndAtDate(idCity, date);
     }
-    public Collection<CarWash> findNearCarWashByUserIdAndDateAndCoordinates(Long idUser, Date date, Double latitude, Double longitude){
-        Collection<CarWash> carWashes = findVacantCarWashByUserIdAndAtDate(idUser, date);
+    public Collection<CarWash> findNearCarWashByUserIdAndDateAndCoordinates(Long idCity, Date date, Double latitude, Double longitude){
+        Collection<CarWash> carWashes = findVacantCarWashByUserIdAndAtDate(idCity, date);
         return distanceCalculator.getNearestCarWashes(latitude,longitude, carWashes.stream().toList(), 3);
     }
 }

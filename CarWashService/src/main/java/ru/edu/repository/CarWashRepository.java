@@ -15,10 +15,13 @@ import java.util.List;
 public interface CarWashRepository extends JpaRepository<CarWash,Long> {
     List<CarWash> findByCity(String city);
 
-    @Query(value = "select cw from time_table tt " +
-            "join car_wash cw on tt.id_car_wash = cw.id_car_wash " +
-            "where tt.date_table = :date and tt.status_free = 1 and tt.id_user = :userId", nativeQuery=true)
-    Collection<CarWash> findVacantCarWashByUserIdAndAtDate(@Param("userId") Long userId,
+    @Query(value = "select * from car_wash cw where " +
+            "cw.id_city = :idCity and  exists ( " +
+            "select * from time_table tt  where " +
+            "tt.id_car_wash = cw.id_car_wash and  cast(tt.date_table as date) = :date and " +
+            "tt.status_free = 0 )",
+            nativeQuery = true)
+    Collection<CarWash> findVacantCarWashByUserIdAndAtDate(@Param("idCity") Long idCity,
                                                            @Param("date") Date date);
 
 

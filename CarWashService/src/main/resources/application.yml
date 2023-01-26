@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5444/postgres
     username: postgres
-    password: postgres
+    password: password
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -37,6 +37,15 @@ service:
   description: CarWash service description
   version: 1.0 BETA
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui-custom.html
+
+# Эндпоинты входящих запросов
 inEndpoint:
   carWashController: /api/v1/CarWash-service/carWash
   timeTableController: /api/v1/CarWash-service/timeTable
+
+outEndpoint:
+  userController:
+    findById: http://localhost:8083/api/v1/admin-service/userInfo/findById/

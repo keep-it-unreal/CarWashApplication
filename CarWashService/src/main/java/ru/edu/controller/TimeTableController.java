@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.HOURS;
+
 @RestController
 @RequestMapping(value = "${inEndpoint.timeTableController}", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -36,12 +38,6 @@ public class TimeTableController {
         List<TimeTable> timeTables = timeTableService.findAll();
         LOGGER.info("getting timeTable list: {}", timeTables);
         return new ResponseEntity<>(timeTables, HttpStatus.OK);
-    }
-
-    @GetMapping("/{timeTableId}")
-    //todo: выяснить как такой PathVariable будет работать? Если будет)
-    public TimeTable getTimeTableById(@PathVariable TimeTableID timeTableId) {
-        return timeTableService.findById(timeTableId);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -69,11 +65,12 @@ public class TimeTableController {
     @GetMapping("/byDate")
     //Получить список свободных временных позиций для заданной даты, мойки
     public ResponseEntity<List<TimeTableDTO>> getTimeTableByDate(@RequestParam @DateTimeFormat(pattern = "dd.MM.yyyy") Date date,
-                                                                 @RequestParam Integer carWashId) {
+                                                                 @RequestParam("idCarWash") Integer carWashId) {
         List<TimeTableDTO> resultTimeTable = timeTableService.findVacantAtDate(date, carWashId)
                 .stream()
                 .map(TimeTableDTO::new)
                 .collect(Collectors.toList());
+        resultTimeTable.forEach(tt -> tt.setDateTable(tt.getDateTable().plus(3L,HOURS)));
         return new ResponseEntity<>(resultTimeTable, HttpStatus.OK);
     }
 
@@ -84,6 +81,7 @@ public class TimeTableController {
                 .stream()
                 .map(TimeTableDTO::new)
                 .collect(Collectors.toList());
+        activeOrdersByUser.forEach(tt -> tt.setDateTable(tt.getDateTable().plus(3L,HOURS)));
         return new ResponseEntity<>(activeOrdersByUser, HttpStatus.OK);
     }
 
@@ -94,6 +92,7 @@ public class TimeTableController {
                 .stream()
                 .map(TimeTableDTO::new)
                 .collect(Collectors.toList());
+        activeOrdersByUser.forEach(tt -> tt.setDateTable(tt.getDateTable().plus(3L,HOURS)));
         return new ResponseEntity<>(activeOrdersByUser, HttpStatus.OK);
     }
 
@@ -104,6 +103,7 @@ public class TimeTableController {
                 .stream()
                 .map(TimeTableDTO::new)
                 .collect(Collectors.toList());
+        allOrdersByUser.forEach(tt -> tt.setDateTable(tt.getDateTable().plus(3L,HOURS)));
         return new ResponseEntity<>(allOrdersByUser, HttpStatus.OK);
     }
 }

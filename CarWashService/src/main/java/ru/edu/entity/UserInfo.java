@@ -29,7 +29,6 @@ public class UserInfo implements Serializable {
 
     private String addressMail;
 
-    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
