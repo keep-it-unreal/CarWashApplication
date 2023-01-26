@@ -17,7 +17,7 @@ import ru.edu.service.UserService;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/admin-service/userInfo/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/admin-service/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserController {
 
@@ -26,101 +26,146 @@ public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
-    @GetMapping("/findById/{id}")
-    public UserInfo findById(@PathVariable Long id){
-        UserInfo user = userService.findById(id);
-        LOGGER.info("getting user by id: {}", user);
-        return user;
+    @GetMapping("/userInfo/findById/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long id){
+        try{
+            UserInfo user = userService.findById(id);
+            LOGGER.info("getting user by id: {}", user);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        } catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @GetMapping("/getUserByName/{userName}")
-    public UserInfo findByName(@PathVariable String userName){
-        UserInfo user = userService.findByName(userName);
-        LOGGER.info("getting user by name: {}", user);
-        return user;
+    @GetMapping("/userInfo/getUserByName/{userName}")
+    public ResponseEntity<?> findByName(@PathVariable String userName){
+        try {
+            UserInfo user = userService.findByName(userName);
+            LOGGER.info("getting user by name: {}", user);
+            return ResponseEntity.status(HttpStatus.OK).body(user);
+        }catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @GetMapping("/getUserByName/{username}")
-    public UserInfo findById(@PathVariable String username){
-        UserInfo user = userService.findByNameAndPhone(username,"8-910-001-01-01");
-        return user;
-    }
-
-    @PostMapping(value = "/login/user", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity loginUser(@RequestBody UserInfoDTO userInfoDTO){
+    @PostMapping(value = "/userInfo/login/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginUser(@RequestBody UserInfoDTO userInfoDTO){
         try{
             UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
             LOGGER.info("logging by name and phone: {}", userInfo);
             if(userInfo.getRole() == UserRoles.USER) {
-                return new ResponseEntity<>(userInfo, HttpStatus.OK);
+                return ResponseEntity.status(HttpStatus.OK).body(userInfo);
             } else {
-                return ResponseEntity.status(HttpStatus.resolve(404)).body("User not found");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Client with role User not found, role is: " + userInfo.getRole());
             }
-        } catch (RuntimeException e){
-            return ResponseEntity.status(HttpStatus.resolve(404)).body(e);
+        } catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-    @PostMapping(value = "/login/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity loginOwner(@RequestBody UserInfoDTO userInfoDTO){
-        UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
-        LOGGER.info("logging by name and phone: {}", userInfo);
-        if(userInfo.getRole() == UserRoles.OWNER) {
-            return new ResponseEntity<>(userInfo, HttpStatus.OK);
-        } else {
-            return ResponseEntity.status(HttpStatus.resolve(404)).body("Owner not found");
+    @PostMapping(value = "/userInfo/login/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> loginOwner(@RequestBody UserInfoDTO userInfoDTO){
+        try {
+            UserInfo userInfo = userService.findByNameAndPhone(userInfoDTO.getName(), userInfoDTO.getPhone());
+            LOGGER.info("logging by name and phone: {}", userInfo);
+            if (userInfo.getRole() == UserRoles.OWNER) {
+                return ResponseEntity.status(HttpStatus.OK).body(userInfo);
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Client with role Owner not found, role is: " + userInfo.getRole());
+            }
+        } catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @GetMapping("/getAllUsers")
-    public List<UserInfo> getAllUsers(){
-        List<UserInfo> list = userService.findAll();
-        LOGGER.info("getting all users: {}", list);
-        return list;
+    @GetMapping("/userInfo/getAllUsers")
+    public ResponseEntity<?> getAllUsers(){
+        try{
+            List<UserInfo> list = userService.findAll();
+            LOGGER.info("getting all users: {}", list);
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @GetMapping("/getAllCities")
-    public List<City> getAllCities(){
-        List<City> list = cityService.findAll();
-        LOGGER.info("getting all cities: {}", list);
-        return list;
+    @GetMapping("/city")
+    public ResponseEntity<?> getAllCities(){
+        try {
+            List<City> list = cityService.findAll();
+            LOGGER.info("getting all cities: {}", list);
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
-    @PostMapping(value = "/register/user", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/userInfo/register/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserInfo> registerUser(@RequestBody UserInfoDTO userDTO){
-        UserInfo userInfo = new UserInfo(userDTO);
-        userInfo.setCity(cityService.findById(userDTO.getIdCity()));
-        userInfo.setRole(UserRoles.USER);
-        userInfo = userService.save(userInfo);
-        LOGGER.info("register user: {}", userInfo);
+        try {
+            UserInfo userInfo = new UserInfo(userDTO);
+            userInfo.setCity(cityService.findById(userDTO.getIdCity()));
+            userInfo.setRole(UserRoles.USER);
+            userInfo = userService.save(userInfo);
+            LOGGER.info("register user: {}", userInfo);
 
-        return new ResponseEntity<>(userInfo, HttpStatus.CREATED);
+            return new ResponseEntity<>(userInfo, HttpStatus.CREATED);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
-    @PostMapping(value = "/register/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/userInfo/register/owner", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserInfo> registerOwner(@RequestBody UserInfoDTO userDTO){
-        UserInfo userInfo = new UserInfo(userDTO);
-        userInfo.setCity(cityService.findById(userDTO.getIdCity()));
-        userInfo.setRole(UserRoles.OWNER);
-        userInfo = userService.save(userInfo);
-        LOGGER.info("register owner: {}", userInfo);
+        try{
+            UserInfo userInfo = new UserInfo(userDTO);
+            userInfo.setCity(cityService.findById(userDTO.getIdCity()));
+            userInfo.setRole(UserRoles.OWNER);
+            userInfo = userService.save(userInfo);
+            LOGGER.info("register owner: {}", userInfo);
 
-        return new ResponseEntity<>(userInfo, HttpStatus.CREATED);
+            return new ResponseEntity<>(userInfo, HttpStatus.CREATED);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
-    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserInfo> updateUser(@RequestBody UserInfoDTO userDTO){
-        UserInfo userInfo = new UserInfo(userDTO);
-        userInfo.setCity(cityService.findById(userDTO.getIdCity()));
-        userInfo = userService.updateUser(userInfo);
-        LOGGER.info("updating user: {}", userInfo);
+    @PutMapping(value = "/userInfo/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateUser(@RequestBody UserInfoDTO userDTO){
+        try{
+            UserInfo userInfo = new UserInfo(userDTO);
+            userInfo.setCity(cityService.findById(userDTO.getIdCity()));
+            userInfo = userService.updateUser(userInfo);
+            LOGGER.info("updating user: {}", userInfo);
 
-        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+            return new ResponseEntity<>(userInfo, HttpStatus.OK);
+        } catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+
     }
 
-    @DeleteMapping("/deleteById/{userId}")
-    public ResponseEntity<UserInfo> deleteById(@PathVariable Long userId){
-        userService.deleteUser(userId);
-        LOGGER.info("deleting user by id: {}", userId);
+    @DeleteMapping("/userInfo/deleteById/{userId}")
+    public ResponseEntity<?> deleteById(@PathVariable Long userId){
+        try {
+            userService.deleteUser(userId);
+            LOGGER.info("deleting user by id: {}", userId);
 
-        return ResponseEntity.ok().build();
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException ex){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        } catch (Exception ex){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }
