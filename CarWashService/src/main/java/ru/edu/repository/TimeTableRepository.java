@@ -23,22 +23,26 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, TimeTableI
     long countByIdIdCarWashAndIdDateTable(Long idCarWash, Instant dBegin);
 
     //todo: и здесь уточнить насчет правильности запросов
-    @Query(value = "select tt from time_table tt " +
-            "where tt.car_wash_id = :carWashId and date_trunc('day',tt.date_table) = date_trunc('day',':date')", nativeQuery = true)
+    @Query(value = "select * from time_table " +
+            "where car_wash_id = :carWashId and date_trunc('day',date_table) = date_trunc('day',':date')", nativeQuery = true)
     List<TimeTable> getByCarWashIdAndDate(@Param("date") Date date, @Param("carWashId") Integer carWashId);
 
-    @Query(value = "select tt from time_table tt " +
-            "where tt.id_user = :idUser and tt.date_table >= now()", nativeQuery = true)
+    @Query(value = "select * from time_table " +
+            "where id_user = :idUser and date_table >= now()", nativeQuery = true)
     List<TimeTable> getActiveOrdersByUser(@Param("idUser") Long idUser);
 
-    @Query(value = "select tt from time_table tt " +
-            "where tt.user_info_id_user = ?1", nativeQuery = true)
+    @Query(value = "select * from time_table " +
+            "where id_user = :idUser and date_table >= now() and status_work = 1", nativeQuery = true)
+    List<TimeTable> getActiveOrdersByUserAndStatusPlanned(@Param("idUser") Long idUser);
+
+    @Query(value = "select * from time_table " +
+            "where id_user = :idUser", nativeQuery = true)
     List<TimeTable> getAllOrdersByUser(@Param("idUser") Long idUser);
 
     @Modifying
     @Transactional
-    @Query(value = "insert into time_table (date_table, id_car_wash, status_free, status_work, id_user)" +
-            "values (:dateTable,:idCarWash,:statusFree,:statusWork,:idUser)" +
+    @Query(value = "insert into time_table (date_table, id_car_wash, status_free, status_work, id_user) " +
+            "values (:dateTable,:idCarWash,:statusFree,:statusWork,:idUser) " +
             "ON CONFLICT (date_table, id_car_wash) DO UPDATE SET date_table=:dateTable, id_car_wash=:idCarWash, status_free=:statusFree, " +
             "status_work=:statusWork, id_user=:idUser", nativeQuery = true)
     void createByUser(@Param("dateTable") Instant dateTable,

@@ -35,7 +35,6 @@ public class CarWash implements Serializable {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_city", foreignKey = @ForeignKey(name = "FK_CAR_WASH_CITY"))
-    //@JsonIgnore
     private City city;
 
     @OneToOne(cascade = CascadeType.ALL)

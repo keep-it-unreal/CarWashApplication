@@ -32,7 +32,6 @@ public class CarWashService {
     }
 
     public CarWash update(CarWash carWash) {
-        findById(carWash.getId());
         return repository.save(carWash);
     }
 

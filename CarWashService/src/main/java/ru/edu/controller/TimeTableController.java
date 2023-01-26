@@ -5,19 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import ru.edu.entity.TimeTable;
 import ru.edu.entity.TimeTableID;
-import ru.edu.entity.UserInfo;
 import ru.edu.entity.dto.TimeTableDTO;
-import ru.edu.service.CarWashService;
 import ru.edu.service.TimeTableService;
 
 import java.util.Date;
@@ -94,7 +90,7 @@ public class TimeTableController {
     @GetMapping("/list-order-off")
     //Получить список запланированных заказов пользователя (дата >= текущей, статус - запланировано )
     public ResponseEntity<List<TimeTableDTO>> getPlannedOrders(@RequestParam Long idUser) {
-        List<TimeTableDTO> activeOrdersByUser = timeTableService.getActiveOrdersByUser(idUser)
+        List<TimeTableDTO> activeOrdersByUser = timeTableService.getActiveOrdersByUserAndStatusPlanned(idUser)
                 .stream()
                 .map(TimeTableDTO::new)
                 .collect(Collectors.toList());

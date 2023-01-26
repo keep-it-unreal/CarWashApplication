@@ -16,8 +16,8 @@ public interface CarWashRepository extends JpaRepository<CarWash,Long> {
     List<CarWash> findByCity(String city);
 
     @Query(value = "select cw from time_table tt " +
-            "join car_wash cw on tt.car_wash_id = cw.id " +
-            "where tt.date_table = :date and tt.status_free = 1 and tt.user_info_id_user = :userId", nativeQuery=true)
+            "join car_wash cw on tt.id_car_wash = cw.id_car_wash " +
+            "where tt.date_table = :date and tt.status_free = 1 and tt.id_user = :userId", nativeQuery=true)
     Collection<CarWash> findVacantCarWashByUserIdAndAtDate(@Param("userId") Long userId,
                                                            @Param("date") Date date);
 

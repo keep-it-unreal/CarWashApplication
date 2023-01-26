@@ -32,6 +32,10 @@ public class TimeTableService {
         return repository.getActiveOrdersByUser(idUser);
     }
 
+    public List<TimeTable> getActiveOrdersByUserAndStatusPlanned(Long idUser) {
+        return repository.getActiveOrdersByUserAndStatusPlanned(idUser);
+    }
+
     public List<TimeTable> getAllOrdersByUser(Long idUser) {
         return repository.getAllOrdersByUser(idUser);
     }
