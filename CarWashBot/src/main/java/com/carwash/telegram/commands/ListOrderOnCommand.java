@@ -94,6 +94,7 @@ public final class ListOrderOnCommand extends SimpleCommand {
         message.setChatId(String.valueOf(chatId));
 
         message.setText(BotText.LIST_ACTIVE_ORDER);
+        message.enableHtml(true);
 
         InlineKeyboardMarkup keyboardMarkup = getInlineKeyboard(allTimeTable);
         message.setReplyMarkup(keyboardMarkup);
@@ -121,20 +122,46 @@ public final class ListOrderOnCommand extends SimpleCommand {
 
             sb = new StringBuilder();
             if (timeTableDto.getStatusWork() == StatusWork.PLANNED) {
-                st = "...план...";
+                st = "услуга запланирована";
             } else if (timeTableDto.getStatusWork() == StatusWork.COMPLETED) {
-                st = "...факт...";
+                st = "услуга была оказана.";
             } else if (timeTableDto.getStatusWork() == StatusWork.CANCEL_OWNER) {
-                st = "...отмена..";
+                st = "отменено владельцем.";
             } else if (timeTableDto.getStatusWork() == StatusWork.CANCEL_USER) {
-                st = "...отказ..";
+                st = "отменено заказчиком.";
             }
 
+            /*
             sb.append(time, 0, 16)
                     .append(" ")
                     .append(st)
                     .append(" ")
                     .append(timeTableDto.getAddress());
+
+             */
+            /*
+            sb.append("Дата: ")
+                    .append("<b>")
+                    .append(time, 0, 10)
+                    .append("</b>\n")
+                    .append("Время: ")
+                    .append("<b>")
+                    .append(time, 10, 16)
+                    .append("</b>\n")
+                    .append("Адрес: ")
+                    .append(timeTableDto.getAddress())
+                    .append("\n")
+                    .append(st)
+                    .append("\n");
+
+             */
+            sb.append(" - ")
+                    .append(time, 0, 16)
+                    .append(" - ")
+                    .append(timeTableDto.getAddress())
+                    .append(" - ")
+                    .append(st)
+                    .append(" - ");
 
             btn.setText(sb.toString());
             btn.setCallbackData(timeTableDto.getDateTable());

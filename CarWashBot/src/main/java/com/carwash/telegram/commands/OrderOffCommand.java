@@ -93,6 +93,7 @@ public final class OrderOffCommand extends SimpleCommand {
 
         //message.setText(BotText.SELECT_TIME);
         message.setText(BotText.LIST_ACTIVE_ORDER);
+        message.enableHtml(true);
 
         InlineKeyboardMarkup keyboardMarkup = getInlineKeyboard(allTimeTable);
         message.setReplyMarkup(keyboardMarkup);

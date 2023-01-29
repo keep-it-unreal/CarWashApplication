@@ -18,6 +18,8 @@
         <module>UserService</module>
         <module>CarWashBot</module>
         <module>CarWashService</module>
+        <module>CarWashBotOwner</module>
+        <module>CarWashOwnerService</module>
     </modules>
     <properties>
         <java.version>17</java.version>

@@ -93,6 +93,7 @@ public final class HistoryCommand extends SimpleCommand {
         message.setChatId(String.valueOf(chatId));
 
         message.setText(BotText.HISTORY);
+        message.enableHtml(true);
 
         InlineKeyboardMarkup keyboardMarkup = getInlineKeyboard(allTimeTable);
         message.setReplyMarkup(keyboardMarkup);
@@ -128,11 +129,30 @@ public final class HistoryCommand extends SimpleCommand {
                 st = "отменено заказчиком.";
             }
 
-            sb.append(time, 0, 16)
-                    .append(" ")
+            /*
+            sb.append("Дата: ")
+                    .append("<b>")
+                    .append(time, 0, 10)
+                    .append("</b>\n")
+                    .append("Время: ")
+                    .append("<b>")
+                    .append(time, 10, 16)
+                    .append("</b>\n")
+                    .append("Адрес: ")
+                    .append(timeTableDto.getAddress())
+                    .append("\n")
                     .append(st)
-                    .append(" ")
-                    .append(timeTableDto.getAddress());
+                    .append("\n")
+
+             */
+
+            sb.append(" - ")
+                    .append(time, 0, 16)
+                    .append(" - ")
+                    .append(timeTableDto.getAddress())
+                    .append(" - ")
+                    .append(st)
+                    .append(" - ");
 
             btn.setText(sb.toString());
             btn.setCallbackData(timeTableDto.getDateTable());
