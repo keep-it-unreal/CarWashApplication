@@ -232,22 +232,21 @@ public class BotController {
 
     /***
      * Обновить данные автомойки
-     * @param idCarWash - id мойки
      * @param userModel - dto автомойки
      * @return {статус ответа, id новой мойки}
      */
     @SneakyThrows
-    public HttpAnswer carWashUpdate(Long idCarWash, @RequestBody CarWashForOwnerDto userModel) {
+    public HttpAnswer carWashUpdate(@RequestBody CarWashForOwnerDto userModel) {
 
-        String url = "http://localhost:" + botConfig.getPortServiceCarWashForOwner() + "/api/v1/CarWash-service/carWash/{idCarWash}";
+        String url = "http://localhost:" + botConfig.getPortServiceCarWashForOwner() + "/api/v1/CarWash-service/carWash/update-by-owner";
 
         HttpHeaders headers  = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<CarWashForOwnerDto> requestEntity = new HttpEntity<>(null, headers);
+        HttpEntity<CarWashForOwnerDto> requestEntity = new HttpEntity<>(userModel, headers);
         HttpAnswer httpAnswer = new HttpAnswer();
         try {
-            ResponseEntity<CarWashForOwnerDto> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, CarWashForOwnerDto.class, idCarWash);
+            ResponseEntity<CarWashForOwnerDto> response = restTemplate.exchange(url, HttpMethod.PUT, requestEntity, CarWashForOwnerDto.class);
 
             httpAnswer.setHttpStatus(response.getStatusCode());
             if (httpAnswer.isSuccess()) {

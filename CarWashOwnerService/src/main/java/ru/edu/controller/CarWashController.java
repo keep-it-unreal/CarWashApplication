@@ -92,6 +92,16 @@ public class CarWashController {
         return new ResponseEntity<>(newCarWashForOwnerDto, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Добавить мойку для данного владельца")
+    @PutMapping(path = "/update-by-owner", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CarWashForOwnerDto> updateCarWashByOwner(@RequestBody CarWashForOwnerDto carWashForOwnerDto) {
+        CarWash carWash = mapper.toModel(carWashForOwnerDto);
+        carWash = service.update(carWash);
+
+        CarWashForOwnerDto newCarWashForOwnerDto = mapper.toDTO(carWash);
+        return new ResponseEntity<>(newCarWashForOwnerDto, HttpStatus.OK);
+    }
+
     @Operation(summary = "Получить информацию о мойке по ее Id")
     @GetMapping("/{carWashId}")
     public CarWash getCarWashById(@PathVariable long carWashId) {

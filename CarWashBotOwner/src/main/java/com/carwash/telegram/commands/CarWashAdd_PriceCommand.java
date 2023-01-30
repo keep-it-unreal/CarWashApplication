@@ -69,7 +69,7 @@ public final class CarWashAdd_PriceCommand extends AnswerCommand {
             botUserService.update(botUser);
             carWashForOwnerDto.setId(botUser.getIdCarWash());
 
-            httpAnswer = botController.carWashUpdate(botUser.getIdCarWash(), carWashForOwnerDto);
+            httpAnswer = botController.carWashUpdate(carWashForOwnerDto);
 
         } else {
             httpAnswer = botController.carWashAdd(carWashForOwnerDto);

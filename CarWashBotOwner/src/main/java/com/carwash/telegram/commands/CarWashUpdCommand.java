@@ -38,10 +38,10 @@ public final class CarWashUpdCommand extends AnswerCommand {
         answer.setChatId(update.getCallbackQuery().getMessage().getChat().getId());
 
         botUser.setPrevStepService(BotUserStepService.CAR_WASH_UPDATE);
-        botUser.setStepService(BotUserStepService.CAR_WASH_LIST_ADD_ADDRESS);
+        botUser.setStepService(BotUserStepService.CAR_WASH_LIST_ADD);
         botUserService.save(botUser);
 
-        answer.setText(BotText.ADD_INPUT_COORD);
+        answer.setText(BotText.ADD_INPUT_ADDRESS);
         execute(absSender, answer, user);
     }
 

@@ -4,8 +4,9 @@ spring:
     username: postgres
     password: 123456
   jpa:
-    hibernate:
-      ddl-auto: create-drop
+#    hibernate:
+#      ddl-auto: create-drop
+
     defer-datasource-initialization: true
     show-sql: true
     properties:
