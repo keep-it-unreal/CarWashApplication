@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - /C:/Users/79022/Desktop/Java/Docker/data
+    environment:
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 8089:5432
+  book-service:
+    image: user_service_image
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
