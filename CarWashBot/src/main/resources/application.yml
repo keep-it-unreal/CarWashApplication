@@ -1,11 +1,12 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://localhost:5444/bevCarWashBot
     username: postgres
-    password: postgres
+    password: password
   jpa:
-    hibernate:
-      ddl-auto: create-drop
+#    hibernate:
+#      ddl-auto: create-drop
+
     defer-datasource-initialization: true
     show-sql: true
     properties:

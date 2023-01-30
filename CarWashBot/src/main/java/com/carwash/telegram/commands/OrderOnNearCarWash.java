@@ -49,11 +49,11 @@ public final class OrderOnNearCarWash extends AnswerCommand {
             String lattitude = parts[0];
             String longitude = parts[1];
 
-            botUser.setLatitude(lattitude);
-            botUser.setLongitude(longitude);
+            botUser.setLatitude(Double.parseDouble(lattitude));
+            botUser.setLongitude(Double.parseDouble(longitude));
             botUser = botUserService.update(botUser);
 
-            HttpAnswer httpAnswer = botController.getNewCarWash(botUser.getIdUser(), botUser.getDateOrder(), botUser.getLatitude(), botUser.getLongitude());
+            HttpAnswer httpAnswer = botController.getNewCarWash(botUser.getIdUser(), botUser.getDateOrder(), lattitude, longitude);
 
             if (!httpAnswer.isSuccess()) {
                 answer.setText(httpAnswer.getStatus());

@@ -61,7 +61,7 @@ public final class OrderOffSelectOrdreCommand extends AnswerCommand {
         timeTableDto.setIdCarWash(botUser.getIdCarWash());
         //timeTableDto.setIdUser(null);
         timeTableDto.setStatusFree(StatusFree.FREE);
-        timeTableDto.setStatusWork(StatusWork.NONE);
+        timeTableDto.setStatusWork(StatusWork.CANCEL_USER);
 
         HttpAnswer httpAnswer = botController.orderOn(timeTableDto);
 

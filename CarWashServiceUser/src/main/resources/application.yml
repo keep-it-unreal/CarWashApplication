@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5444/postgres
+    username: postgres
+    password: password
+  jpa:
+#    hibernate:
+#      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  sql:
+    init:
+      mode: always
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
+
+server:
+  port: 8080
+
+logging:
+  level:
+    ru.edu: info
+  file:
+    name: carService.log
+    path: ./
+
+service:
+  title: CarWash service Api
+  description: CarWash service description
+  version: 1.0 BETA
+

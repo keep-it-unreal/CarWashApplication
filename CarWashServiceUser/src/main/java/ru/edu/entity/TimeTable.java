@@ -1,0 +1,49 @@
+package ru.edu.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.edu.entity.enums.StatusFree;
+import ru.edu.entity.enums.StatusWork;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TimeTable implements Serializable {
+
+    @EmbeddedId
+    private TimeTableID id;
+
+    //private Long idUser;
+
+    private StatusFree statusFree;
+
+    private StatusWork statusWork;
+
+/*
+    @Column(name = "candidate_id", nullable=false)
+    private Long candidate_id;
+    @ManyToOne(optional=false)
+    @JoinColumn(name = "candidate_id", insertable=false, updatable=false)
+    private Candidate candidate;
+
+ */
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "idCarWash", foreignKey = @ForeignKey(name = "FK_TIME_TABLE_CAR"), insertable=false, updatable=false)
+    @JsonIgnore
+    private CarWash carWash;
+
+    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+    @JoinColumn(name = "idUser", foreignKey = @ForeignKey(name = "FK_TIME_TABLE_USER"))
+    private UserInfo userInfo;
+
+    public TimeTableID getID() {
+        return id;
+    }
+
+}

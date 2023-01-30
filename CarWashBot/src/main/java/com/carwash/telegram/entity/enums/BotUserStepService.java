@@ -11,7 +11,19 @@ public enum BotUserStepService {
     ORDER_ON_SELECT_CAR_WASH,   //7
     ORDER_ON_SELECT_TIME,       //8
     LIST_ORDER_ON,              //9
-    ORDER_OFF_SELECT_ORDER;     //10
+    ORDER_OFF_SELECT_ORDER,     //10
+
+
+    CAR_WASH_LIST,              //4
+    CAR_WASH_LIST_ADD,          //5
+    CAR_WASH_LIST_ADD_ADDRESS,  //6
+    CAR_WASH_LIST_ADD_COORD,    //7
+    CAR_WASH_LIST_ADD_BEGIN_END,    //8
+    CAR_WASH_ONE,               //9
+    TIME_SUM,                   //10
+    TIME_SUM_LIST,              //11
+    CAR_WASH_UPDATE,            //12
+    TIME_LIST_ORDER;            //13
 
 
     BotUserStepService() {
