@@ -58,7 +58,8 @@ public class TimeTableController {
     @GetMapping("/byDate")
     public ResponseEntity<List<TimeTableDto>> getTimeTableByDateByIdCarWash(@RequestParam("date") String date, @RequestParam("idCarWash") Long idCarWash) {
         try {
-            List<TimeTable> timeTableList = service.findByDateByIdCarWash(date,idCarWash);
+            Instant idata = DateConverter.StringToInstant(date);
+            List<TimeTable> timeTableList = service.findByDateByIdCarWash(idata,idCarWash);
             log.info("getting timeTableList list: {}", timeTableList);
             List<TimeTableDto> timeTableDtoList = mapperList.toDtoList(timeTableList);
 

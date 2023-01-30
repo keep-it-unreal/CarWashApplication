@@ -19,7 +19,7 @@ public interface TimeTableSumReportDtoRepository extends JpaRepository<TimeTable
             "cw.id_car_wash, " +
             "cw.address, " +
             "cw.price, " +
-            "count(cw.*) as ch " +
+            "count(tt.id_car_wash) as ch " +
             "from " +
             "car_wash cw left outer join " +
             "time_table tt on " +

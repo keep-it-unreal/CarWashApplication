@@ -23,7 +23,7 @@ public class TimeTableService {
         return repository.findAll();
     }
 
-    public List<TimeTable> findByDateByIdCarWash(String date, Long idCarWash) {
+    public List<TimeTable> findByDateByIdCarWash(Instant date, Long idCarWash) {
         return repository.findByDateByIdCarWash(date,idCarWash);
     }
 

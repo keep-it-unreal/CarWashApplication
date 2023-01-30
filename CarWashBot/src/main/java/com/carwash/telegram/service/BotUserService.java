@@ -6,6 +6,7 @@ import com.carwash.telegram.exception.ItemNotFoundException;
 import com.carwash.telegram.repository.BotUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
@@ -65,11 +66,11 @@ public class BotUserService {
     }
 
     /***
-    * Для пользователя с именем name
-    * получить текущий шаг сервиса
-    * @param name - имя пользователя
-    * @return BotUserStepService - шаг сервиса
-    */
+     * Для пользователя с именем name
+     * получить текущий шаг сервиса
+     * @param name - имя пользователя
+     * @return BotUserStepService - шаг сервиса
+     */
     public BotUserStepService getServiceStep(String name) {
         BotUser botUser = getBotUser(name);
         return botUser.getStepService();

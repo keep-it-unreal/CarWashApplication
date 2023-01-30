@@ -33,7 +33,7 @@ public interface TimeTableRepository extends JpaRepository<TimeTable, TimeTableI
             "tt.status_free = 0 " +
             "order by tt.date_table",
             nativeQuery = true)
-    List<TimeTable> findByDateByIdCarWash(@Param("selectedDate") String date,
+    List<TimeTable> findByDateByIdCarWash(@Param("selectedDate") Instant date,
                                                @Param("id_car_wash") Long idCarWash);
 
     @Query(value = "select * from time_table tt " +
