@@ -8,10 +8,10 @@ services:
     ports:
       - 8089:5432
   book-service:
-    image: user_service_image
+    image: car_wash_user_service_image
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/postgres
     ports:
-      - 8080:8080
+      - 8080:8083
     depends_on:
       - db
